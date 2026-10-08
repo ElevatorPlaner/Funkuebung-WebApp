@@ -33,3 +33,7 @@ Voraussetzung: Python mit Playwright (`pip install playwright`) und Chromium, au
 
 - `tools/build_uebungsleiter.py` baut `uebungsleiter.html` aus der Vorlage.
 - `tools/build_pdf_fonts.py` erzeugt die in die PDFs eingebetteten Schriften (Liberation Sans, SIL Open Font License, als Teilmenge) und setzt sie in `funkuebung.html` und `standalone.html` ein. Nur nötig, wenn sich die Schrift ändern soll (braucht `fonttools`).
+
+## Dateien in den Drive-Ordner holen
+
+`tools/Dateien_aktualisieren.bat` auf dem Windows-Rechner doppelklicken (die `.ps1` muss daneben liegen). Es lädt `funkuebung.html`, `standalone.html` und `uebungsleiter.html` aus dem Repo und überschreibt damit `Funkuebung_ELW_V2.html`, `Funkuebung_ELW_Standalone.html` und `Funkuebung_Uebungsleiter_Tablet.html` im Ordner "WebApp Funkübung". Insync lädt sie danach ins Google Drive.
