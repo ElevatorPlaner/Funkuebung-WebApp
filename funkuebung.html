@@ -1374,7 +1374,7 @@ function showResult(r) {
   $('#rTeam').textContent = 'ELW: ' + r.team + '   |   Einheiten: ' + r.trupps.map(t => DATA.ort + ' ' + t).join(', ');
   $('#rTime').textContent = fmt(r.time); $('#rErr').textContent = r.errs;
   $('#rMods').textContent = r.mods.filter(m => m.solved).length + '/' + r.mods.length;
-  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('') + r.trupps.map(e => { const fr = (r.fragen || []).filter(f => f.e === e), ok = fr.filter(f => f.ok).length, no = fr.length - ok; return fr.length ? `<tr class="fr"><td>${esc(DATA.ort + ' ' + e + ': Technikfragen')}</td><td><span class="stat-ok">${ok} richtig</span>, <span class="${no ? 'stat-no' : 'stat-ok'}">${no} falsch</span></td><td>${no}</td><td>-</td></tr>` : ''; }).join('') + (r.aufgaben || []).map(f => `<tr class="fr"><td>${esc(DATA.ort + ' ' + f.e + ': ' + f.titel)}</td><td class="${f.ok ? 'stat-ok' : 'stat-no'}">${f.ok ? 'geklappt' : 'nicht geklappt'}</td><td>${f.ok ? 0 : 1}</td><td>-</td></tr>`).join('') + unitRows(r);
+  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('') + r.trupps.map(e => { const fr = (r.fragen || []).filter(f => f.e === e), ok = fr.filter(f => f.ok).length, no = fr.length - ok; return fr.length ? `<tr class="fr"><td>${esc(DATA.ort + ' ' + e + ': Technikfragen')}</td><td><span class="stat-ok">${ok} richtig</span>${no ? `, <span class="stat-no">${no} falsch</span>` : ''}</td><td>${no}</td><td>-</td></tr>` : ''; }).join('') + (r.aufgaben || []).map(f => `<tr class="fr"><td>${esc(DATA.ort + ' ' + f.e + ': ' + f.titel)}</td><td class="${f.ok ? 'stat-ok' : 'stat-no'}">${f.ok ? 'geklappt' : 'nicht geklappt'}</td><td>${f.ok ? 0 : 1}</td><td>-</td></tr>`).join('') + unitRows(r);
   show('result');
 }
 $('#rAgain').onclick = () => { initStart(); tryStart(); };
@@ -1411,7 +1411,7 @@ function eveningLines(list) {
     r.mods.forEach(m => L.push(['      ' + m.name + ': ' + (m.solved ? 'gelöst' : 'offen') + ', Fehler ' + m.errors, 10, 0]));
     (r.units || []).forEach(u => L.push(['      ' + DATA.ort + ' ' + u.e + ', Zeit der Einheit: ' + (u.done ? fmt(u.time) + ' (davon Strafzeit ' + fmt(u.pen) + ')' : 'offen'), 10, 0]));
     (r.aufgaben || []).forEach(f => L.push(['      ' + f.titel + ' ' + DATA.ort + ' ' + f.e + ': ' + (f.ok ? 'geklappt' : 'nicht geklappt'), 10, 0]));
-    r.trupps.forEach(e => { const fr = (r.fragen || []).filter(f => f.e === e), ok = fr.filter(f => f.ok).length; if (fr.length) L.push(['      Technikfragen ' + DATA.ort + ' ' + e + ': ' + ok + ' richtig, ' + (fr.length - ok) + ' falsch', 10, 0]); });
+    r.trupps.forEach(e => { const fr = (r.fragen || []).filter(f => f.e === e), ok = fr.filter(f => f.ok).length; if (fr.length) L.push(['      Technikfragen ' + DATA.ort + ' ' + e + ': ' + ok + ' richtig' + (fr.length - ok ? ', ' + (fr.length - ok) + ' falsch' : ''), 10, 0]); });
     L.push(['', 8, 0]);
   });
   const ok = list.filter(r => r.ok).length, err = list.reduce((a, r) => a + r.errs, 0);
@@ -1492,7 +1492,7 @@ function roundCanvas(r, bg) {
     };
     g.mods.forEach(m => row(m.short, m.solved ? 'gelöst nach ' + fmt(m.at) : 'offen', m.solved, 'Fehler ' + m.errors));
     g.au.forEach(f => row(f.titel, f.ok ? 'geklappt' : 'nicht geklappt', f.ok, 'Fehler ' + (f.ok ? 0 : 1)));
-    if (g.fr.length) { const no = g.fr.filter(f => !f.ok).length; row('Technikfragen', (g.fr.length - no) + ' richtig, ' + no + ' falsch', no === 0, 'Fehler ' + no); }
+    if (g.fr.length) { const no = g.fr.filter(f => !f.ok).length; row('Technikfragen', (g.fr.length - no) + ' richtig' + (no ? ', ' + no + ' falsch' : ''), no === 0, 'Fehler ' + no); }
     if (g.u) row('Zeit der Einheit', g.u.done ? fmt(g.u.time) : 'offen', g.u.done, g.u.done ? 'davon Strafzeit ' + fmt(g.u.pen) : '-');
     y += 8;
   });
