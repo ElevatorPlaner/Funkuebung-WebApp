@@ -2,8 +2,9 @@
 
 - `funkuebung.html`: die App für den ELW-PC (eine Datei, offline lauffähig, wird nicht veröffentlicht)
 - `standalone.html`: abgeleitete Fassung ohne Technikfragen per QR-Code und Handy und ohne Übungsleiter-App (eigener Speicherschlüssel `funks_settings`). Wird parallel zur App weiterentwickelt, `funkuebung.html` bleibt das Hauptprojekt.
+- `uebungsleiter.html`: Tablet-App für den Übungsleiter (Live-Kontrolle, Fragen und Antworten je Einheit, Dienstabend). Entsteht aus `uebungsleiter.template.html` per `python3 tools/build_uebungsleiter.py`, der Fragenpool wird dabei aus `fragen.html` übernommen. Nur Änderungen an der Vorlage machen, nicht an der erzeugten Datei.
 - `fragen.html`: Handy-Seite für die Technikfragen, wird per GitHub Pages unter https ausgeliefert
-- Der Fragenpool (`fragen:` im `DATA`-Block) muss in beiden Dateien identisch sein.
+- Der Fragenpool (`fragen:` im `DATA`-Block) muss in `funkuebung.html`, `fragen.html` und `uebungsleiter.html` identisch sein (`tests/chk.py` prüft das).
 
 ## Regel für Änderungen
 

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Übungsleiter Funkübung</title>
+<style>
+:root{
+  --bg:#17202B; --panel:#1F2B38; --panel2:#283748; --line:#3A4A5C; --box:#18232F; --stage:#4a525d;
+  --fg:#F5F2EB; --muted:#C9D1DA; --red:#B8321F; --red2:#D9442F; --amber:#F0B03C; --green:#4FA36A; --blue:#4C86D6;
+  --h:'Oswald','Arial Narrow','Roboto Condensed','Franklin Gothic Medium',Impact,sans-serif;
+  --b:'Public Sans','Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--stage);color:var(--fg);font-family:var(--b);font-size:17px;line-height:1.4;-webkit-text-size-adjust:100%;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hide{display:none}
+.muted{color:var(--muted)}
+.top{background:var(--bg);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:10px 18px;min-height:84px}
+.top .nr{font-family:var(--h);font-size:1.5rem;color:var(--amber);letter-spacing:.03em;line-height:1.1}
+.top .tm{color:var(--fg);opacity:.9}
+.tc{text-align:center}
+.clock{font-family:var(--h);font-size:3.6rem;line-height:1;font-weight:600;letter-spacing:.02em}
+.clock.warn{color:var(--amber)} .clock.crit{color:var(--red2)}
+.cl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tr{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.hpill{display:inline-flex;align-items:center;gap:6px;height:28px;border-radius:999px;border:1px solid var(--line);background:#121a23;min-width:82px;justify-content:space-between;white-space:nowrap;padding:0 10px}
+.hpill span{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.hpill b{font-size:.64rem;font-weight:700;letter-spacing:.06em;line-height:1}
+.hpill.has{border-color:var(--red2);background:rgba(217,68,47,.16)} .hpill.has b{color:var(--red2)}
+.hpill.tf b{color:var(--green)}
+.bar2{background:#121a23;border-top:1px solid var(--line);padding:8px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tabs{display:flex;gap:8px}
+.tab{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:6px 18px;font-family:var(--h);font-size:1.1rem;letter-spacing:.05em;text-transform:uppercase;min-height:42px}
+.tab.on{background:var(--red);border-color:var(--red2)}
+.conn{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.conn.off{color:var(--amber)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--muted)} .dot.on{background:var(--green)} .dot.off{background:var(--red2)}
+.gear{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.85rem;padding:6px}
+.wrap{padding:14px;max-width:1500px;margin:0 auto}
+.state{display:inline-block;padding:2px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:.8rem;margin-left:8px;vertical-align:middle}
+.state.run{border-color:var(--green);color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:14px}
+.tbox{background:var(--box);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:10px}
+.tbox.done{border-color:var(--green)}
+.th{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.th .sp{flex:1}
+.tp{display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:220px;height:30px;padding:0 12px;border-radius:999px;background:var(--amber);color:#17202B;font-weight:700;font-size:.9rem;white-space:nowrap}
+.mp{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:20px;padding:0 10px;margin-right:4px;border-radius:999px;background:var(--blue);color:#fff;font-family:var(--h);font-weight:600;letter-spacing:.08em;font-size:.8rem;vertical-align:middle}
+.mp.dmo{background:var(--green);color:#10200f}
+.sb{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:8px;background:#121a23;border:1px solid var(--line);font-size:.85rem;color:var(--muted);white-space:nowrap;overflow:hidden}
+.sb b{color:var(--fg)} .sb.dmo{border-color:var(--green)} .sb.dmo b{color:var(--green)}
+.sb.act{border-color:var(--amber);background:rgba(240,176,60,.14)}
+.sb .sa{margin-left:auto}
+.phase{color:var(--muted);font-size:.9rem}
+.lbl{font-family:var(--h);text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;color:var(--muted)}
+.bar{display:flex;gap:4px;margin-top:6px}
+.seg{flex:1;height:16px;border-radius:4px;background:var(--panel2);border:1px solid var(--line)}
+.seg.ok{background:var(--green);border-color:var(--green)}
+.seg.err{box-shadow:inset 0 -4px 0 var(--red2)}
+.chips{display:flex;gap:8px;margin-top:6px}
+.chip{flex:1;text-align:center;padding:6px 0;border-radius:8px;border:2px solid var(--line);background:var(--panel2);font-family:var(--h);font-size:1.25rem}
+.chip.done{background:var(--green);border-color:var(--green);color:#fff}
+.chip.next{border-color:var(--amber);color:var(--amber)}
+.badge{font-size:.78rem;padding:2px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.badge.vorn{border-color:var(--green);color:var(--green)} .badge.zurueck{border-color:var(--amber);color:var(--amber)}
+.banner{margin-bottom:14px;padding:12px 16px;border-radius:12px;border:2px solid var(--amber);background:#3a3a2e;font-size:1.05rem}
+.banner.bad{border-color:var(--red2);background:#4a3030}
+.legend{margin-top:14px;font-size:.85rem;color:#e3e8ee}
+.empty{padding:40px 16px;text-align:center;color:#e3e8ee;font-size:1.15rem}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:10px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.q .t{font-weight:700;font-size:1.05rem}
+.q .l{margin:2px 0 8px;color:var(--muted);font-size:.92rem}
+.opt{display:flex;gap:10px;padding:7px 12px;margin-top:6px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);font-size:.95rem}
+.opt .m{min-width:22px;font-family:var(--h);font-size:1.2rem;line-height:1.2}
+.opt.right{border-color:var(--green)} .opt.right .m{color:var(--green)}
+.opt.wrong{border-color:var(--red2);background:rgba(217,68,47,.16)} .opt.wrong .m{color:var(--red2)}
+.sel{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.pillb{background:var(--box);border:2px solid var(--line);border-radius:8px;padding:8px 14px;min-height:44px}
+.pillb.on{background:var(--red);border-color:var(--red2)}
+.tblwrap{background:var(--box);border:1px solid var(--line);border-radius:14px;padding:6px 12px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th{font-family:var(--h);font-weight:500;text-transform:uppercase;letter-spacing:.06em;font-size:.8rem;color:var(--muted)}
+tr.click{cursor:pointer} tr.click:hover{background:var(--panel2)}
+.ul{display:flex;align-items:center;gap:10px;margin:3px 0;flex-wrap:wrap}
+.ul .tp{min-width:200px;height:26px;font-size:.82rem}
+.res.ok{color:var(--green)} .res.no{color:var(--red2)}
+.sech{font-family:var(--h);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;margin:18px 0 8px;color:#fff}
+.worst{background:var(--box);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.btn{display:inline-block;background:var(--red2);border:0;border-radius:8px;padding:12px 20px;color:#fff;font-family:var(--h);font-size:1.2rem;letter-spacing:.06em;text-transform:uppercase;min-height:44px}
+.btn.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--fg)}
+input[type=text]{width:100%;padding:12px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font:inherit}
+.set{max-width:560px;margin:30px auto;background:var(--box);border:1px solid var(--line);border-radius:14px;padding:18px}
+.set p{margin:10px 0}
+</style>
+</head>
+<body>
+<div class="top">
+  <div><div class="nr" id="hNr">Übungsleiter</div><div class="tm" id="hTm"></div></div>
+  <div class="tc"><div class="clock" id="hClock" data-clock>--:--</div><div class="cl" id="hCl"></div></div>
+  <div class="tr"><div class="hpill"><span>Module</span><b id="hMod">0/0</b></div><div class="hpill" id="hErrP"><span>Fehler</span><b id="hErr">0</b></div></div>
+</div>
+<div class="bar2">
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-v="live">Live</button>
+    <button class="tab" data-v="fragen">Fragen</button>
+    <button class="tab" data-v="abend">Abend</button>
+  </div>
+  <div class="conn" id="conn"><span class="dot" id="dot"></span><span id="connTxt">nicht verbunden</span><button class="gear" id="gear">Kanal</button></div>
+</div>
+<div class="wrap">
+  <div id="vSet" class="hide"></div>
+  <div id="vLive"></div>
+  <div id="vFragen" class="hide"></div>
+  <div id="vAbend" class="hide"></div>
+</div>
+
+<script>
+const POOL = [
+    { id: 1, titel: 'Funkschatten',
+      lage: 'Eure Einheit steht im Keller, der Empfang ist abgehackt. Was ist richtig?',
+      opt: ['Sendetaste mehrfach drücken', 'Rufgruppe wechseln', 'Standort wechseln, Antenne frei und senkrecht halten'], ok: 2 },
+    { id: 2, titel: 'TMO oder DMO',
+      lage: 'Die Einheiten stimmen sich direkt an der Einsatzstelle ab, ohne Netz und ohne Leitstelle. Welche Betriebsart?',
+      opt: ['DMO (Direct Mode Operation, Direktbetrieb von Gerät zu Gerät)', 'TMO (Trunked Mode Operation, Betrieb über das Netz)', 'Beides geht nicht'], ok: 0 },
+    { id: 3, titel: 'Fehlersuche',
+      lage: 'Das Gerät ist an, der Akku ist voll, aber ihr hört den ELW nicht. Was prüft ihr zuerst?',
+      opt: ['SI-Karte tauschen', 'Antenne abschrauben', 'Betriebsart (TMO oder DMO) und Rufgruppe prüfen'], ok: 2 },
+    { id: 4, titel: 'Notruf im DMO',
+      lage: 'Jemand löst im DMO (Direct Mode Operation) den Notruf aus. Wer hört mit?',
+      opt: ['Alle Geräte in der DMO-Rufgruppe, das Mikrofon ist etwa 15 Sekunden offen', 'Nur die Leitstelle', 'Niemand, es wird nur ein Signal gesendet'], ok: 0 },
+    { id: 5, titel: 'Akku',
+      lage: 'Welche Aussage zum Akkuwechsel ist richtig?',
+      opt: ['Kalte Akkus werden sofort geladen', 'Nur bei ausgeschaltetem Gerät, Kontakte sauber halten', 'Das geht auch bei laufendem Gerät'], ok: 1 },
+    { id: 6, titel: 'Status ohne FMS',
+      lage: 'Das Funkmeldesystem (FMS) ist ausgefallen. Ihr habt den Einsatzauftrag übernommen und seid auf dem Weg. Wie meldet ihr das?',
+      opt: ['Status 3 über die Zifferntaste senden', 'Gar nicht, die Leitstelle erfährt es von selbst', 'Per Sprechfunk im Klartext mit Rufname melden'], ok: 2 },
+    { id: 7, titel: 'Nachricht einstufen',
+      lage: 'Ein Atemschutzgeräteträger setzt den Mayday-Ruf ab. Wie ist das einzustufen?',
+      opt: ['Einfach', 'Blitz', 'Sofort'], ok: 1 },
+    { id: 8, titel: 'Eintreffmeldung',
+      lage: 'Ihr erreicht die Einsatzstelle. Wann darf die Eintreffmeldung abgegeben werden?',
+      opt: ['Sobald die Einsatzstelle in Sicht ist', 'Erst am endgültigen Standort', 'Schon bei der Abfahrt'], ok: 1 },
+    { id: 9, titel: 'Notruftaste',
+      lage: 'Die Notruftaste wurde in der Jackentasche versehentlich gedrückt. Was tust du?',
+      opt: ['Nichts, das merkt keiner', 'Leitstelle sofort informieren, dass es ein Versehen war', 'Gerät ausschalten und weitermachen'], ok: 1 },
+    { id: 10, titel: 'Sendetaste',
+      lage: 'Bei deiner Meldung geht der Anfang immer verloren. Was ist richtig?',
+      opt: ['Lauter sprechen', 'Taste beim Sprechen kurz loslassen', 'Taste drücken, kurz warten, dann sprechen'], ok: 2 },
+    { id: 11, titel: 'Mayday im Funkverkehr',
+      lage: 'Ein Mayday wird abgesetzt. Was tun alle anderen in der Rufgruppe?',
+      opt: ['Funkverkehr einstellen und mithören', 'Leiser weitersprechen', 'Sofort die Rufgruppe wechseln'], ok: 0 },
+    { id: 12, titel: 'Tastensperre',
+      lage: 'Wozu dient die Tastensperre am Handfunkgerät?',
+      opt: ['Sie verschlüsselt den Funk', 'Sie erhöht die Reichweite', 'Sie verhindert versehentliche Eingaben, etwa einen Rufgruppenwechsel'], ok: 2 },
+    { id: 13, titel: 'DMO Reichweite',
+      lage: 'Im DMO reißt die Verbindung zwischen zwei weit entfernten Einheiten ab. Warum?',
+      opt: ['Im DMO funken die Geräte direkt miteinander, die Reichweite ist begrenzt', 'Die Leitstelle hat die Rufgruppe gesperrt', 'Der Akku sendet nach einer Stunde schwächer'], ok: 0 },
+    { id: 14, titel: 'Gerät einschalten',
+      lage: 'Du schaltest dein Funkgerät ein und steckst es in die Tasche. Was stellst du sicher?',
+      opt: ['Die Lautstärke steht auf Maximum, damit du alles hörst', 'Das Gerät bleibt auf der Rufgruppe vom letzten Einsatz', 'Betriebsart und Rufgruppe passen zur Aufgabe, die Tastensperre ist aktiv'], ok: 2 },
+    { id: 15, titel: 'Personenbezogene Daten',
+      lage: 'Ihr betreut an der Einsatzstelle eine verletzte Person. Was gehört nicht in den Funkverkehr?',
+      opt: ['Die Anzahl der Verletzten', 'Name, Anschrift und/oder Geburtsdatum der Person', 'Der Treffpunkt für den Rettungsdienst'], ok: 1 }
+];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ORT = 'Aidlingen', STATIONEN = [1, 2, 3, 4], RG_STATION = 3, SPREAD = 2, STALE = 90, BASE = 'https://ntfy.sh/';
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* Kanal aus dem Link uebernehmen, danach aus der Adresszeile entfernen */
+let kanal = '';
+try {
+  const q = new URLSearchParams(location.search).get('k');
+  if (q) { store.set('uel_kanal', q.replace(/[^A-Za-z0-9_-]/g, '')); history.replaceState(null, '', location.pathname); }
+} catch (e) {}
+kanal = store.get('uel_kanal', '') || '';
+
+let runs = store.get('uel_runs_' + kanal, {}), sel = null, view = 'live', lastId = null, online = false, lastPoll = 0, abendTag = null;
+function save() {
+  const keys = Object.keys(runs).sort((a, b) => runs[b].first - runs[a].first);
+  keys.slice(80).forEach(k => delete runs[k]);
+  store.set('uel_runs_' + kanal, runs);
+}
+
+/* ---------- Nachrichten aufnehmen ---------- */
+function runOf(r, time) {
+  if (!runs[r]) runs[r] = { r, first: time, ans: {}, arr: {} };
+  if (time < runs[r].first) runs[r].first = time;
+  return runs[r];
+}
+function ingest(m, time) {
+  if (!m || !m.r || !m.t) return false;
+  const run = runOf(m.r, time);
+  if (m.t === 'start') { Object.assign(run, { nr: m.nr, tm: m.tm, lim: m.lim, pn: m.pn, e: m.e, o: m.o, mn: m.mn, t0s: time }); return true; }
+  if (m.t === 'prog') { if (!run.prog || time >= run.prog._t) { run.prog = Object.assign({}, m, { _t: time }); if (!run.e) run.e = m.tl.map(u => u.e); } return true; }
+  if (m.t === 'end') { run.end = Object.assign({}, m, { _t: time }); return true; }
+  if (m.t === 'ans') { run.ans[m.e + '|' + m.s] = { e: m.e, s: m.s, a: m.a || [], _t: time }; if (!run.e) run.e = [m.e]; return true; }
+  if (m.t === 'arr') { run.arr[m.e + '|' + m.s] = time; return true; }
+  return false;
+}
+
+/* ---------- Abfrage (alle 3 s, robust gegen schlafende Tablets) ---------- */
+async function poll() {
+  if (!kanal) return;
+  try {
+    const since = lastId || '12h';
+    const r = await fetch(BASE + kanal + '/json?poll=1&since=' + encodeURIComponent(since), { cache: 'no-store' });
+    if (!r.ok) throw new Error('http ' + r.status);
+    const txt = await r.text(); let ch = false;
+    txt.split('\n').filter(Boolean).forEach(l => {
+      let o; try { o = JSON.parse(l); } catch (e) { return; }
+      if (o.event !== 'message') return;
+      lastId = o.id;
+      let m; try { m = JSON.parse(o.message); } catch (e) { return; }
+      if (ingest(m, o.time)) ch = true;
+    });
+    online = true; lastPoll = Date.now();
+    if (ch) { save(); render(); }
+  } catch (e) { online = false; }
+  paintConn();
+}
+function paintConn() {
+  $('dot').className = 'dot ' + (kanal ? (online ? 'on' : 'off') : '');
+  $('conn').classList.toggle('off', !!kanal && !online);
+  $('connTxt').textContent = !kanal ? 'kein Kanal' : online ? 'ELW verbunden' : 'keine Verbindung';
+}
+
+/* ---------- Auswertung ---------- */
+const FUNK = { TMO: { gruppe: 'FW BB LG AID', kurzwahl: '1460', prefix: 'Florian' }, DMO: { gruppe: '308_F*', kurzwahl: '308', prefix: 'Florentine' } };
+const rufname = (mode, e) => FUNK[mode].prefix + ' ' + ORT + ' ' + e;
+const startMode = (run, i) => (i % 2 === 0 ? 'TMO' : 'DMO');   /* wie in der Haupt-App: 1. Einheit TMO, 2. DMO */
+const fmt = sec => { sec = Math.max(0, Math.floor(sec)); return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0'); };
+function qOf(id) { return POOL.find(x => x.id === id); }
+function answersOf(run, e) {
+  return Object.values(run.ans).filter(a => a.e === e).sort((a, b) => a.s - b.s)
+    .flatMap(a => a.a.map(([id, ch]) => { const q = qOf(id); return q ? { s: a.s, q, ch, ok: q.ok === ch } : null; }).filter(Boolean));
+}
+function unitStats(run, i) {
+  const e = run.e[i], pu = run.prog && run.prog.tl.find(u => u.e === e);
+  const eu = run.end && run.end.mods && run.end.mods[i];
+  const mods = pu ? pu.m : (eu || []);
+  const solved = mods.filter(m => m[0]).length, merr = mods.reduce((a, m) => a + (m[1] || 0), 0);
+  const done = new Set([...(pu ? pu.d : []), ...Object.values(run.ans).filter(a => a.e === e).map(a => a.s), ...Object.keys(run.arr).filter(k => k.split('|')[0] === e).map(k => +k.split('|')[1])]);
+  const an = answersOf(run, e), right = an.filter(x => x.ok).length, wrong = an.length - right;
+  const rg = pu ? pu.rg : null;
+  return { e, pu, mods, solved, merr, done, an, right, wrong, rgFail: rg === false ? 1 : 0, rg, errs: merr + wrong + (rg === false ? 1 : 0), steps: solved + done.size, total: mods.length + STATIONEN.length };
+}
+function runState(run) { return run.end ? 'end' : (run.prog && run.prog.run) ? 'run' : 'wait'; }
+function currentRun() {
+  if (sel && runs[sel]) return runs[sel];
+  const list = Object.values(runs).filter(r => r.e).sort((a, b) => b.first - a.first);
+  return list.find(r => !r.end) || list[0] || null;
+}
+function clockOf(run) {
+  const p = run.prog, st = runState(run);
+  if (st === 'end') return { txt: fmt(run.end.time), cls: '', lbl: 'Endzeit' };
+  if (!p || !p.run) return { txt: run.lim ? fmt(run.lim) : '00:00', cls: '', lbl: 'Startet nach Funkcheck' };
+  const el = p.el + (Date.now() / 1000 - p._t) + p.pen;
+  if (run.lim) { const left = run.lim - el; return { txt: fmt(Math.ceil(left)), cls: left <= 30 ? 'crit' : left <= 60 ? 'warn' : '', lbl: 'Restzeit' }; }
+  return { txt: fmt(el), cls: '', lbl: 'Zeit' };
+}
+function paintHead(run) {
+  const c = run ? clockOf(run) : { txt: '--:--', cls: '', lbl: '' };
+  $('hNr').textContent = run && run.nr ? 'Einsatz-Nr. ' + run.nr : 'Übungsleiter';
+  $('hTm').textContent = run && run.tm ? run.tm : '';
+  const hc = $('hClock'); hc.textContent = c.txt; hc.className = 'clock ' + c.cls; $('hCl').textContent = c.lbl;
+  let solved = 0, total = 0, errs = 0;
+  if (run && run.e) run.e.forEach((_, i) => { const s = unitStats(run, i); solved += s.solved; total += s.mods.length; errs += s.errs; });
+  $('hMod').textContent = solved + '/' + total; $('hErr').textContent = errs; $('hErrP').classList.toggle('has', errs > 0);
+}
+const vpill = (run, i, mode) => '<span class="tp">' + esc(rufname(mode || startMode(run, i), run.e[i])) + '</span>';
+
+/* ---------- Ansicht: Live ---------- */
+function phaseText(st) {
+  if (!st.pu) return 'noch keine Meldung';
+  const k = st.pu.k;
+  if (k === 'start') return 'Schritt 1: wartet auf den Funkcheck';
+  if (k === 'rg') return 'Station 3: Rufgruppenwechsel läuft';
+  if (k === 'rgdone') return 'Station 3: Rufgruppenwechsel ' + (st.pu.rg ? 'geklappt' : 'nicht geklappt');
+  return 'unterwegs';
+}
+function unitBox(run, i, tag) {
+  const st = unitStats(run, i), e = st.e, mode = st.pu ? st.pu.g : startMode(run, i), f = FUNK[mode];
+  const ord = (run.o && run.o[i]) || STATIONEN, next = ord.find(n => !st.done.has(n));
+  const segs = st.mods.map(m => '<div class="seg' + (m[0] ? ' ok' : '') + (m[1] ? ' err' : '') + '"></div>').join('') || '<div class="seg"></div>';
+  const chips = ord.map(n => '<div class="chip' + (st.done.has(n) ? ' done' : n === next ? ' next' : '') + '">' + n + '</div>').join('');
+  const act = st.pu && (st.pu.k === 'start' || st.pu.k === 'rg');
+  const frag = st.an.length ? st.right + '/' + st.an.length : '-';
+  return '<div class="tbox' + (st.steps >= st.total && st.total > 4 ? ' done' : '') + '"><div class="th">' + vpill(run, i, mode) + (tag ? '<span class="badge ' + tag[0] + '">' + tag[1] + '</span>' : '') + '<span class="sp"></span>' +
+    '<div class="hpill"><span>Module</span><b>' + st.solved + '/' + st.mods.length + '</b></div>' +
+    '<div class="hpill tf"><span>Fragen</span><b>' + frag + '</b></div>' +
+    '<div class="hpill' + (st.errs ? ' has' : '') + '"><span>Fehler</span><b>' + st.errs + '</b></div></div>' +
+    '<div class="sb' + (mode === 'DMO' ? ' dmo' : '') + (act ? ' act' : '') + '"><span class="sg"><span class="mp' + (mode === 'DMO' ? ' dmo' : '') + '">' + mode + '</span> <b>' + esc(f.gruppe) + '</b> <i>(Kurzwahl ' + f.kurzwahl + ')</i></span><span class="sa">Stationen <b>' + st.done.size + '/4</b></span></div>' +
+    '<div class="phase">' + esc(phaseText(st)) + '</div>' +
+    '<div><div class="lbl">Module</div><div class="bar">' + segs + '</div></div>' +
+    '<div><div class="lbl">Stationen in der Reihenfolge dieser Einheit</div><div class="chips">' + chips + '</div></div></div>';
+}
+function renderLive() {
+  const run = currentRun(), el = $('vLive');
+  paintHead(run);
+  if (!kanal) { el.innerHTML = ''; return; }
+  if (!run || !run.e) { el.innerHTML = '<div class="empty">Noch keine Übung gesehen.<br>Sobald der ELW eine Übung startet, erscheint sie hier.</div>'; return; }
+  const state = runState(run), p = run.prog;
+  const stale = state !== 'end' && p && (Date.now() / 1000 - p._t) > STALE;
+  const stats = run.e.map((_, i) => unitStats(run, i));
+  const max = Math.max(...stats.map(s => s.steps)), min = Math.min(...stats.map(s => s.steps)), spread = state === 'run' && stats.length > 1 && max - min >= SPREAD;
+  let top = '';
+  if (stale) top += '<div class="banner bad">Seit ' + fmt(Date.now() / 1000 - p._t) + ' Minuten keine Meldung vom ELW. Läuft die App noch und hat der ELW-PC Internet?</div>';
+  if (spread) {
+    const lead = stats.filter(s => s.steps === max).map(s => rufname(startMode(run, run.e.indexOf(s.e)), s.e)).join(' und '), back = stats.filter(s => s.steps === min).map(s => rufname(startMode(run, run.e.indexOf(s.e)), s.e)).join(' und ');
+    top += '<div class="banner">' + esc(lead) + ' liegt ' + (max - min) + ' Schritte vor ' + esc(back) + '.</div>';
+  }
+  if (state === 'end') top += '<div class="banner' + (run.end.ok ? '' : ' bad') + '">' + esc(run.end.reason || 'Übung beendet') + '</div>';
+  const cards = run.e.map((_, i) => unitBox(run, i, spread ? (stats[i].steps === max ? ['vorn', 'vorn'] : stats[i].steps === min ? ['zurueck', 'zurück'] : null) : null)).join('');
+  el.innerHTML = top + '<div class="grid">' + cards + '</div>' +
+    '<div class="legend">Ein Schritt ist ein gelöstes Modul oder eine erledigte Station. Eine Einheit gilt als vorn, ab ' + SPREAD + ' Schritten Abstand. Ein roter Balken unter einem Modul zeigt Fehler in diesem Modul.</div>';
+}
+
+/* ---------- Ansicht: Fragen (gruppiert je Einheit) ---------- */
+function runTitle(run) {
+  const d = new Date(run.first * 1000);
+  return (run.nr || 'Übung') + (run.tm ? ', ' + run.tm : '') + ' (' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr)';
+}
+function renderFragen() {
+  const run = currentRun(), el = $('vFragen');
+  paintHead(run);
+  if (!run || !run.e) { el.innerHTML = '<div class="empty">Noch keine Antworten vorhanden.</div>'; return; }
+  let h = '<div class="sech" style="margin-top:0">' + esc(runTitle(run)) + '</div><div class="grid" style="grid-template-columns:1fr">';
+  run.e.forEach((e, i) => {
+    const st = unitStats(run, i);
+    h += '<div class="tbox"><div class="th">' + vpill(run, i) + '<span class="sp"></span>' +
+      (st.rg !== null && st.rg !== undefined ? '<div class="hpill' + (st.rg ? ' tf' : ' has') + '"><span>Rufgruppenwechsel</span><b>' + (st.rg ? 'geklappt' : 'nicht geklappt') + '</b></div>' : '') +
+      '<div class="hpill tf"><span>Richtig</span><b>' + st.right + '</b></div><div class="hpill' + (st.wrong ? ' has' : '') + '"><span>Falsch</span><b>' + st.wrong + '</b></div></div>';
+    if (!st.an.length) h += '<div class="muted">Noch keine Antworten.</div>';
+    h += '<div class="qgrid">' + st.an.map(x => '<div class="q"><div class="lbl">Station ' + x.s + '</div><div class="t">' + esc(x.q.titel) + '</div><div class="l">' + esc(x.q.lage) + '</div>' +
+      x.q.opt.map((o, k) => '<div class="opt ' + (k === x.q.ok ? 'right' : k === x.ch ? 'wrong' : '') + '"><span class="m">' + (k === x.ch ? (x.ok ? '✓' : '✗') : k === x.q.ok ? '✓' : '') + '</span><span>' + esc(o) + (k === x.ch ? ' <i class="muted">(Antwort der Einheit)</i>' : '') + '</span></div>').join('') + '</div>').join('') + '</div></div>';
+  });
+  el.innerHTML = h + '</div>';
+}
+
+/* ---------- Ansicht: Abend ---------- */
+const dayKey = t => { const d = new Date(t * 1000); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function renderAbend() {
+  const el = $('vAbend'), all = Object.values(runs).filter(r => r.e).sort((a, b) => a.first - b.first);
+  paintHead(currentRun());
+  if (!all.length) { el.innerHTML = '<div class="empty">Noch keine Runden gespeichert.<br>Das Tablet speichert alles, was es während des Abends sieht.</div>'; return; }
+  const days = [...new Set(all.map(r => dayKey(r.first)))].reverse();
+  if (!abendTag || !days.includes(abendTag)) abendTag = days[0];
+  const list = all.filter(r => dayKey(r.first) === abendTag);
+  const fmtDay = k => { const [y, m, d] = k.split('-'); return d + '.' + m + '.' + y; };
+  let h = '<div class="sel">' + days.map(d => '<button class="pillb' + (d === abendTag ? ' on' : '') + '" data-day="' + d + '">' + fmtDay(d) + '</button>').join('') + '</div>';
+  const miss = {};
+  list.forEach(r => r.e.forEach(e => answersOf(r, e).forEach(x => { const m = miss[x.q.id] = miss[x.q.id] || { t: x.q.titel, n: 0, w: 0 }; m.n++; if (!x.ok) m.w++; })));
+  const worst = Object.values(miss).filter(m => m.w).sort((a, b) => b.w / b.n - a.w / a.n || b.w - a.w).slice(0, 5);
+  h += '<div class="tblwrap"><table><tr><th>Zeit</th><th>Gruppe</th><th>Ergebnis</th><th>Zeit im Einsatz</th><th>Einheiten</th></tr>';
+  list.forEach(r => {
+    const t = new Date(r.first * 1000).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    const res = r.end ? '<span class="res ' + (r.end.ok ? 'ok' : 'no') + '">' + esc(r.end.reason) + '</span>' : '<span class="muted">nicht beendet gesehen</span>';
+    const us = r.e.map((e, i) => { const s = unitStats(r, i); return '<div class="ul">' + vpill(r, i) + '<span class="hpill"><span>Module</span><b>' + s.solved + '/' + s.mods.length + '</b></span><span class="hpill tf"><span>Fragen</span><b>' + (s.an.length ? s.right + '/' + s.an.length : '-') + '</b></span><span class="hpill' + (s.errs ? ' has' : '') + '"><span>Fehler</span><b>' + s.errs + '</b></span></div>'; }).join('');
+    h += '<tr class="click" data-run="' + esc(r.r) + '"><td>' + t + '</td><td>' + esc(r.tm || r.nr || '') + '</td><td>' + res + '</td><td>' + (r.end ? fmt(r.end.time) : '') + '</td><td>' + us + '</td></tr>';
+  });
+  h += '</table></div>';
+  if (worst.length) h += '<div class="sech">Am häufigsten falsch <small class="muted" style="font-family:var(--b);font-size:.9rem;text-transform:none">an diesem Abend</small></div><div class="worst">' + worst.map(m => '<div>' + esc(m.t) + ': ' + m.w + ' von ' + m.n + ' falsch</div>').join('') + '</div>';
+  el.innerHTML = h + '<div class="legend">Antippen einer Runde öffnet ihre Fragen und Antworten zur Besprechung.</div>';
+}
+
+/* ---------- Einstellungen ---------- */
+function renderSet() {
+  $('vSet').innerHTML = '<div class="card set"><h2 class="sech" style="margin-top:0">Kanal</h2>' +
+    '<p class="muted">Den Link mit dem Kanal erzeugt die Funkübung-App am ELW-PC (Einstellungen, Tablet-Link). Alternativ den Kanalnamen hier eintragen.</p>' +
+    '<p><input type="text" id="kIn" placeholder="funk-..." autocomplete="off" spellcheck="false" value="' + esc(kanal) + '"></p>' +
+    '<p><button class="btn" id="kSave">Speichern</button> <button class="btn ghost" id="kBack">Zurück</button></p>' +
+    '<p class="muted" style="margin-top:20px">Gespeicherte Runden: ' + Object.keys(runs).length + '. <button class="gear" id="kClear">Alle löschen</button></p></div>';
+  $('kSave').onclick = () => { const v = $('kIn').value.replace(/[^A-Za-z0-9_-]/g, ''); if (!v) return; kanal = v; store.set('uel_kanal', v); runs = store.get('uel_runs_' + kanal, {}); lastId = null; sel = null; show(view); poll(); };
+  $('kBack').onclick = () => show(view);
+  $('kClear').onclick = () => { if (confirm('Alle gespeicherten Runden auf diesem Tablet löschen?')) { runs = {}; sel = null; save(); render(); } };
+}
+
+/* ---------- Steuerung ---------- */
+function show(v) {
+  view = v; const set = v === 'set' || !kanal;
+  ['live', 'fragen', 'abend'].forEach(k => $('v' + k[0].toUpperCase() + k.slice(1)).classList.toggle('hide', set || k !== v));
+  $('vSet').classList.toggle('hide', !set);
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  if (set) renderSet(); else render();
+  paintConn();
+}
+function render() {
+  if (view === 'live') renderLive(); else if (view === 'fragen') renderFragen(); else if (view === 'abend') renderAbend();
+}
+$('tabs').addEventListener('click', ev => { const b = ev.target.closest('.tab'); if (b) show(b.dataset.v); });
+$('gear').onclick = () => show('set');
+$('vAbend').addEventListener('click', ev => {
+  const d = ev.target.closest('[data-day]'); if (d) { abendTag = d.dataset.day; renderAbend(); return; }
+  const r = ev.target.closest('[data-run]'); if (r) { sel = r.dataset.run; show('fragen'); }
+});
+/* Uhr jede Sekunde nachziehen */
+setInterval(() => { const run = currentRun(); if (!run || view === 'set') return; const c = clockOf(run), el = $('hClock'); el.textContent = c.txt; el.className = 'clock ' + c.cls; $('hCl').textContent = c.lbl; }, 1000);
+/* Bildschirm anlassen */
+async function wake() { try { if (navigator.wakeLock) await navigator.wakeLock.request('screen'); } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { wake(); poll(); } });
+wake();
+show(kanal ? 'live' : 'set');
+poll(); setInterval(poll, 3000);
+</script>
+</body>
+</html>

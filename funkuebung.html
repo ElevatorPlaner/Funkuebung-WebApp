@@ -939,7 +939,7 @@ function paintBox(ti) {
   else if (st === 'rgdone') sa.innerHTML = (G.rgRes[ti] ? '<span class="stat-ok">Anmeldung geklappt</span>' : '<span class="stat-no">Anmeldung nicht geklappt</span>') + `<span>Stationen <b>${pr}</b></span>`;
   else sa.innerHTML = '';
 }
-function rgState(ti) { tqPost({ t: 'state', r: G.run, e: G.tl[ti], g: G.mode[ti], gr: DATA.funk[G.mode[ti]].gruppe, k: G.tk[ti], d: [...G.stDone[ti]] }); }
+function rgState(ti) { tqSnap(); tqPost({ t: 'state', r: G.run, e: G.tl[ti], g: G.mode[ti], gr: DATA.funk[G.mode[ti]].gruppe, k: G.tk[ti], d: [...G.stDone[ti]] }); }
 function startAll() {
   if (!G || G.ended) return;
   if (!G.t0) G.t0 = Date.now();
@@ -1016,6 +1016,7 @@ function loop() {
   if (G.cfg.mode === 'limit' && shown <= 0) endGame('Zeit abgelaufen');
 }
 function updateHud() {
+  tqSnap();
   const s = G.mods.filter(m => m.solved).length;
   $('#gSolved').textContent = s + '/' + G.mods.length; $('#gErr').textContent = G.errs; $('#gErrP').classList.toggle('has', G.errs > 0);
   G.boxes.forEach((b, ti) => {
@@ -1051,7 +1052,7 @@ function onSolved(m) {
   if (G.mods.every(x => x.solved)) setTimeout(() => endGame('Lage gesichert'), 700);
 }
 function endGame(reason) {
-  if (!G || G.ended) return; G.ended = true; clearInterval(tick); tqStop();
+  if (!G || G.ended) return; G.ended = true; clearInterval(tick); tqStop(true);
   const t = total();
   const rec = {
     nr: G.nr, date: today(), team: G.cfg.team, reason, ok: reason === 'Lage gesichert',
@@ -1063,6 +1064,7 @@ function endGame(reason) {
   };
   const list = store.get('funk_runden_' + today(), []); list.push(rec); store.set('funk_runden_' + today(), list);
   G.rec = rec; showResult(rec);
+  tqPost({ t: 'end', r: G.run, nr: G.nr, reason, ok: rec.ok, time: Math.round(rec.time), errs: G.errs, pen: G.pen, mods: G.tl.map((e, ti) => G.mods.filter(m => m.ti === ti).map(m => [m.solved ? 1 : 0, m.errors, m.at === null ? null : Math.round(m.at)])) });
 }
 const ICON_X = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 function paintAbort(armed) { const b = $('#gAbort'); b.classList.toggle('arm', !!armed); b.innerHTML = armed ? 'Wirklich abbrechen?' : ICON_X; b.dataset.tip = armed ? 'Noch einmal antippen: Übung wird beendet' : 'Übung abbrechen (zweimal antippen)'; b.setAttribute('aria-label', b.dataset.tip); }
@@ -1177,11 +1179,19 @@ function qrMatrix(text) {
    Technikfragen: Kanal (ntfy.sh), Auswertung, QR-Druck
    ========================================================= */
 const TQ_BASE = 'https://ntfy.sh/';
-let tqES = null, tqLive = false;
+let tqES = null, tqLive = false, tqSnapT = null, tqHB = null;
+/* Spielstand fuer das Tablet des Uebungsleiters: ganzer Stand in einer kleinen Nachricht, gebuendelt (ntfy begrenzt die Rate) */
+function tqSnapNow() {
+  tqSnapT = null; if (!G || G.ended || !S.tqK) return;
+  tqPost({ t: 'prog', r: G.run, run: G.t0 ? 1 : 0, el: G.t0 ? Math.round((Date.now() - G.t0) / 1000) : 0, pen: G.pen, errs: G.errs,
+    tl: G.tl.map((e, ti) => ({ e, g: G.mode[ti], k: G.tk[ti], d: [...G.stDone[ti]], rg: G.rgRes[ti], m: G.mods.filter(m => m.ti === ti).map(m => [m.solved ? 1 : 0, m.errors, m.at === null ? null : Math.round(m.at)]) })) });
+}
+function tqSnap() { if (!G || G.ended || !S.tqK || tqSnapT) return; tqSnapT = setTimeout(tqSnapNow, 2500); }
 function tqPost(obj) { if (!S.tqK) return; try { fetch(TQ_BASE + S.tqK, { method: 'POST', body: JSON.stringify(obj) }).catch(() => {}); } catch (e) {} }
 function tqStart() {
   tqStop(true);
-  tqPost({ t: 'start', r: G.run, e: G.tl, o: G.order });
+  tqPost({ t: 'start', r: G.run, e: G.tl, o: G.order, nr: G.nr, tm: G.cfg.team, lim: G.cfg.mode === 'limit' ? G.cfg.limit : 0, pn: G.cfg.pen, mn: G.tl.map((_, ti) => G.mods.filter(m => m.ti === ti).map(m => m.def.name)) });
+  tqHB = setInterval(tqSnapNow, 30000);
   G.tl.forEach((_, ti) => rgState(ti));
   try {
     tqES = new EventSource(TQ_BASE + S.tqK + '/sse?since=1h');
@@ -1192,6 +1202,7 @@ function tqStart() {
   tqStatus();
 }
 function tqStop(quiet) {
+  clearInterval(tqHB); clearTimeout(tqSnapT); tqSnapT = null;
   if (tqES) { tqES.close(); tqES = null; }
   tqLive = false;
   if (!quiet && G) tqPost({ t: 'end', r: G.run });

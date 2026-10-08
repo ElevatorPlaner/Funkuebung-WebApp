@@ -3,7 +3,7 @@ name: Handy-Seite veroeffentlichen
 on:
   push:
     branches: [main, claude/new-session-o2eqi2]
-    paths: [fragen.html, .github/workflows/pages.yml]
+    paths: [fragen.html, uebungsleiter.html, .github/workflows/pages.yml]
   workflow_dispatch:
 
 permissions:
@@ -27,6 +27,7 @@ jobs:
         run: |
           mkdir _site
           cp fragen.html _site/index.html
+          cp uebungsleiter.html _site/uebungsleiter.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
