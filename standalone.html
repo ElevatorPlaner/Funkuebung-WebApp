@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Funkübung ELW (Standalone)</title>
+<style>
+/* Schriften: Oswald und Public Sans werden genutzt, wenn installiert. Einbettung als woff2 siehe Konzept (Platz: @font-face unten). */
+/*FONTFACE*/
+:root{
+  --bg:#17202B; --panel:#1F2B38; --panel2:#283748; --line:#3A4A5C;
+  --fg:#F5F2EB; --muted:#C9D1DA; --gray:#4A5563;
+  --red:#B8321F; --red2:#D9442F; --amber:#F0B03C; --green:#4FA36A; --blue:#4C86D6;
+  --h:'Oswald','Arial Narrow','Roboto Condensed','Franklin Gothic Medium',Impact,sans-serif;
+  --b:'Public Sans','Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--b);font-size:16px;touch-action:manipulation;-webkit-text-size-adjust:100%;overflow:hidden}
+button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,.cond{font-family:var(--h);font-weight:600;letter-spacing:.03em;text-transform:uppercase;margin:0}
+.screen{display:none;height:100dvh;overflow:auto}
+.screen.on{display:block}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px 16px;min-height:44px;font-weight:600}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--h);text-transform:uppercase;letter-spacing:.06em;font-size:1.35rem;padding:14px 28px}
+.btn.primary:hover{background:var(--red2)}
+.btn.ghost{background:transparent}
+input.req{border-color:var(--red2)!important;box-shadow:0 0 0 2px rgba(217,68,47,.35)}
+#toEvening,#rEve{background:rgba(240,176,60,.16);border-color:var(--amber);color:var(--amber)}
+#toEvening:hover,#rEve:hover{background:rgba(240,176,60,.28);border-color:var(--amber)}
+.btn:disabled{opacity:.4;cursor:default}
+.stripe{height:8px;background:var(--red)}
+/* Start */
+.wrap{max-width:760px;margin:0 auto;padding:20px 20px 40px}
+.brand{display:flex;align-items:baseline;gap:14px;margin:6px 0 4px}
+.brand h1{font-size:2.4rem}
+.brand span{color:var(--amber);font-family:var(--h);letter-spacing:.12em;text-transform:uppercase}
+.lead{color:var(--muted);margin:0 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+label.f{display:block;color:var(--muted);font-size:.85rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+input[type=text],input[type=number],select{background:#121a23;border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px;width:100%}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+
+
+details.card summary{cursor:pointer;font-family:var(--h);text-transform:uppercase;letter-spacing:.06em;font-size:1.1rem;list-style:none}
+details.card summary::before{content:'+ ';color:var(--amber)}
+details.card[open] summary::before{content:'- '}
+details.card .inner{margin-top:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 16px;align-items:start}
+details.card .inner label.f{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:1.2em;line-height:1.2em}
+details.card .inner input,details.card .inner .seg,details.card .inner .seg button{height:48px;min-height:48px}
+details.card .inner .chips{display:grid;grid-template-columns:repeat(auto-fill,152px);gap:10px}
+details.card .inner .chip{height:42px;padding:0 8px;border-radius:999px;width:152px}
+@media (max-width:640px){details.card .inner{grid-template-columns:1fr}details.card .inner>div{grid-column:1/-1!important}}
+details.card .inner .seg button{font-size:.9rem;padding:6px 4px}
+.unit{position:relative}.unit input{padding-right:100px}.unit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.unit input[type=number]{-moz-appearance:textfield}.unit input::-webkit-outer-spin-button,.unit input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;height:1.2em}.lab label.f{margin:0}
+.cnt2{font-size:.85rem;color:var(--muted)}.cnt2 b{color:var(--amber)}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:0;background:#121a23;padding:10px;min-height:44px;font-weight:600}
+.seg button.on{background:var(--red);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:#121a23;min-height:40px;font-weight:600}
+.chip.on{background:var(--amber);color:#17202B;border-color:var(--amber)}
+.nextnr{display:flex;justify-content:space-between;align-items:center;gap:24px;margin:18px 0 12px;flex-wrap:wrap}
+.nextnr>div{text-align:right}
+.nextnr .nr{font-family:var(--h);font-size:1.5rem;letter-spacing:.06em;color:var(--amber)}
+.plbox{margin-top:0}
+.plsub.u{text-decoration:underline;text-underline-offset:2px}
+.plsub{font-size:.8em;text-transform:none;letter-spacing:.02em;color:var(--muted)}
+.plsum{float:right;display:inline-flex;align-items:center;justify-content:center;width:110px;height:26px;margin-top:-3px;border-radius:999px;border:1px solid var(--line);background:#121a23;font-family:inherit;text-transform:none;letter-spacing:0;font-size:.8rem;font-weight:600;color:var(--muted);white-space:nowrap}
+.plsum.r{color:#fff;background:var(--red);border-color:var(--red)}.plsum.y{color:#17202B;background:var(--amber);border-color:var(--amber)}.plsum.g{color:#fff;background:var(--green);border-color:var(--green)}
+.plin{margin-top:12px}
+.plrow{display:flex;align-items:center;gap:12px;background:#121a23;border:1px solid var(--line);border-radius:9px;padding:8px 12px;margin-bottom:8px}
+.plrow .plchk{flex:none;width:22px;height:22px;min-height:0;padding:0;border-radius:6px;border:2px solid #4a5a6b;background:transparent;color:#fff;font-size:.9rem;line-height:1;display:grid;place-items:center}
+.plrow.on .plchk{background:var(--green);border-color:var(--green)}
+.plrow .pln{flex:1;min-width:0}.plrow .pln b{display:block;font-size:.95rem}.plrow .pln small{color:var(--muted);font-size:.78rem}
+.plrow .plw{flex:none;width:92px;text-align:center;border-radius:999px;padding:2px 0;font-size:.74rem;font-weight:700;color:#17202B}
+.plrow .btn{flex:none;min-height:0;width:84px;height:32px;padding:0;background:var(--red);border-color:var(--red);color:#fff;font-weight:700;font-size:.85rem}
+@media (max-width:640px){.plrow .plw{display:none}.plrow .btn{width:64px}.plsum{float:none;display:flex;margin:6px 0 0}}
+.plfoot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.plcnt{color:var(--green);font-size:.85rem;min-width:0}
+.plfoot .btn{min-height:0;height:34px;padding:0 16px;font-size:.88rem}
+.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:flex-end}
+/* Spiel */
+#game.on{display:grid;grid-template-rows:auto 1fr;overflow:hidden}
+.top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.top .l .nr{font-family:var(--h);font-size:1.25rem;letter-spacing:.06em;color:var(--amber)}
+.top .l .team{color:var(--muted);font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clock{justify-self:center;font-family:var(--h);font-weight:600;font-size:clamp(2.2rem,5.5vw,3.6rem);line-height:1;text-align:center;letter-spacing:.04em;position:relative}
+.clock.wait{opacity:.5}
+#game .grid{background:#4a525d}
+#gSound,#gAbort{width:44px;padding:0;display:grid;place-items:center;position:relative}#gSound.off{color:var(--muted)}
+#funkBar .mp[data-tip]{cursor:help}#funkBar .mp[data-tip]:hover::after{left:0;right:auto;white-space:nowrap;max-width:none}
+#gAbort.arm{width:auto;padding:0 14px;border-color:var(--red2);color:var(--red2);font-weight:700}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);right:0;z-index:30;width:max-content;max-width:260px;padding:6px 10px;border-radius:8px;background:#0b1118;border:1px solid var(--line);color:var(--fg);font:500 .78rem/1.3 var(--b);letter-spacing:0;text-transform:none;text-align:left;white-space:normal;box-shadow:0 6px 18px rgba(0,0,0,.5);pointer-events:none}
+.clock.warn{color:var(--amber)} .clock.crit{color:var(--red2)}
+.clock small{display:block;font-family:var(--b);font-size:.72rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;font-weight:400}
+.pen{position:absolute;right:-70px;top:6px;color:var(--red2);font-size:1.1rem;opacity:0;transition:opacity .3s}
+.pen.show{opacity:1}
+.top .r{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:nowrap}
+.top .r .btn{padding:8px 12px;white-space:nowrap;font-size:.9rem}
+.hpill{display:inline-flex;align-items:center;gap:6px;height:28px;border-radius:999px;border:1px solid var(--line);background:#121a23;min-width:82px;justify-content:space-between;white-space:nowrap;padding:0 10px}
+.hpill span{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.hpill b{font-family:inherit;font-size:.64rem;font-weight:700;letter-spacing:.06em;line-height:1}
+.hpill.has{border-color:var(--red2);background:rgba(217,68,47,.16)}.hpill.has b{color:var(--red2)}
+
+
+
+.funk{display:flex;align-items:center;gap:10px;padding:6px 14px;background:#121a23;border-bottom:1px solid var(--line);font-size:.92rem;flex-wrap:wrap}
+.funk .g{color:var(--muted)}
+.funk .trupps>.g{width:52px;flex:none}
+.funk .elwrow>.g{width:auto}
+.funk .trupps{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;white-space:nowrap}
+.funk .pill{flex:none;display:inline-flex;align-items:center;justify-content:center;width:220px;height:30px;border-radius:999px;background:var(--amber);color:#17202B;font-weight:600;font-size:.85rem;white-space:nowrap}
+.funk .pill.elw{background:#F5F2EB;color:#17202B;font-weight:800;font-size:.72rem;position:relative;padding:0 42px;justify-content:center}
+.funk .pill.elw .mp{position:absolute;left:4px;top:50%;transform:translateY(-50%);min-width:0;width:36px;height:22px;margin:0;padding:0;font-size:.72rem}
+.funk b{color:var(--fg)}
+.gamebody{display:grid;grid-template-rows:auto 1fr;min-height:0}
+.grid{display:grid;gap:10px;padding:10px;min-height:0;grid-template-columns:repeat(var(--cols),minmax(0,1fr));grid-template-rows:repeat(var(--rows),minmax(0,1fr))}
+.grid.many{grid-template-columns:repeat(var(--cols),minmax(560px,1fr));overflow-x:auto;overflow-y:hidden;padding-bottom:16px;scrollbar-width:thin;scrollbar-color:rgba(245,242,235,.35) transparent}
+.grid.many::-webkit-scrollbar{height:10px}.grid.many::-webkit-scrollbar-track{background:transparent}
+.grid.many::-webkit-scrollbar-thumb{background:rgba(245,242,235,.35);border-radius:99px;border:2px solid transparent;background-clip:padding-box}
+.grid.many::-webkit-scrollbar-thumb:hover{background:rgba(245,242,235,.6);background-clip:padding-box}
+.tbox{background:#18232F;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;min-height:0;padding:8px;gap:8px}
+.tbox.done{border-color:var(--green)}
+.tbox .th{display:flex;align-items:center;gap:10px;flex:none}
+.tbox .tp{display:inline-flex;align-items:center;justify-content:center;flex:none;width:220px;box-sizing:border-box;height:30px;padding:0 8px;border-radius:999px;background:var(--amber);color:#17202B;font-weight:700;font-size:.9rem;white-space:nowrap}
+.tbox .sb{display:flex;align-items:center;gap:10px;flex:none;height:30px;padding:0 10px;border-radius:8px;background:#121a23;border:1px solid var(--line);font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden}
+.tbox .sb .sg b{color:var(--fg)}.tbox .sb.dmo{border-color:var(--green)}.tbox .sb.dmo .sg b{color:var(--green)}
+.tbox .sb.act{border-color:var(--amber);background:rgba(240,176,60,.14)}
+.tbox .sb .sa{display:flex;gap:6px;align-items:center;margin-left:auto}
+.mp{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:20px;padding:0 10px;margin-right:4px;border-radius:999px;background:var(--blue);color:#fff;font-family:var(--h);font-weight:600;letter-spacing:.08em;font-size:.8rem;vertical-align:middle}
+.mp.dmo{background:var(--green);color:#10200f}
+.funk .fcbr{flex:0 0 100%;height:0;order:8}
+.funk .fcbar{flex:none;box-sizing:border-box;order:9;height:44px;display:flex;align-items:center;gap:14px;padding:0 14px;border:2px solid var(--red2);border-radius:10px;font-family:var(--h);text-transform:uppercase;letter-spacing:.05em}
+.funk .fcbar .n{width:28px;height:28px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-size:1rem;letter-spacing:0}
+.funk .fcbar.tight{gap:10px;padding:0 10px}.funk .fcbar.tight .t{font-size:.78rem}.funk .fcbar.tight #fcAll{font-size:.72rem;margin-left:4px}
+.funk .fcbar .tsub{font-size:.75em;text-transform:none;letter-spacing:.02em;color:var(--muted)}
+.funk .fcbar .t{flex:none;font-size:1rem;white-space:nowrap}
+.funk #fcAll{flex:none;min-height:0;height:30px;padding:0 10px;border:0;border-radius:7px;background:var(--red);color:#fff;font-family:var(--h);text-transform:uppercase;letter-spacing:.05em;font-size:.84rem;margin-left:10px;white-space:nowrap}
+.funk #fcAll:hover{background:var(--red2)}
+.tbox .sb .btn{min-height:0;padding:2px 10px;font-size:.76rem;line-height:1.3}
+.tbox .th .sp2{flex:1}
+@media (max-width:1180px){.tbox .th{gap:6px}.tbox .th .hpill{min-width:0;padding:0 8px;gap:4px}.tbox .th .tp{font-size:.9rem;padding:0 8px}}
+.tbox.done .th .tdone{display:inline}.tbox .th .tdone{display:none;color:var(--green);font-weight:700;font-size:.85rem;letter-spacing:.06em;text-transform:uppercase}
+.tgrid{display:grid;gap:8px;flex:1;min-height:0;grid-template-columns:repeat(var(--c),minmax(0,1fr));grid-template-rows:repeat(var(--r),minmax(0,1fr))}
+.tbox.tlock .tgrid{position:relative}.tbox.tlock .tgrid::before{content:'';position:absolute;inset:0;z-index:5;border-radius:10px;background:rgba(40,54,70,.8);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);pointer-events:none}.tbox{position:relative}
+.lknote{position:absolute;left:50%;transform:translate(-50%,-50%);z-index:6;display:flex;align-items:center;gap:12px;width:max-content;max-width:94%;padding:9px 14px;border-radius:10px;background:var(--panel2);border:1px solid var(--red);box-shadow:0 6px 18px rgba(0,0,0,.5);font-family:var(--h);text-transform:uppercase;letter-spacing:.04em;font-size:.8rem;line-height:1.55;text-align:center;color:var(--fg)}
+.lknote .lkchk{flex:none;width:26px;height:26px;min-height:0;padding:0;border-radius:7px;border:2px solid #6c7c8d;background:transparent;color:#fff;font-size:1rem;line-height:1;display:grid;place-items:center;cursor:pointer}
+.lknote.ok{border-color:var(--green);background:#1d3a2b}.lknote.ok .lkchk{background:var(--green);border-color:var(--green)}
+.lknote small{display:block;font-family:var(--b);font-size:.72rem;margin-top:2px;letter-spacing:.02em;text-transform:none;color:var(--muted)}
+.mod.act{border-color:var(--amber)}
+.mod{background:var(--panel);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden;position:relative}
+.mod header{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.mod header h3{font-size:clamp(.85rem,1.3vw,1.05rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;margin-right:8px}
+.mod header .eb{display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 9px;flex:none;white-space:nowrap;border-radius:999px;border:1px solid var(--line);background:#121a23;font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.mod header .eb b{font-family:inherit;font-size:inherit;font-weight:700;letter-spacing:inherit;color:var(--fg)}
+.mod header .eb.has{border-color:var(--red2);background:rgba(217,68,47,.16)}.mod header .eb.has b{color:var(--red2)}
+.mod .body{padding:8px 12px;display:flex;flex-direction:column;gap:6px;flex:1;min-height:0}
+.mod .body .big{flex:none;height:28px;line-height:28px;margin:0}.mod .body .big+*{margin-top:auto}.mod .body>:last-child{margin-bottom:auto}
+.mod.solved{border-color:var(--green)}
+.mod.solved::after{content:'GELÖST';position:absolute;inset:36px 0 0 0;background:rgba(23,32,43,.82);display:flex;align-items:center;justify-content:center;font-family:var(--h);font-size:2rem;letter-spacing:.14em;color:var(--green)}
+.mod.shake{animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.hint{color:var(--muted);font-size:.82rem;text-align:center}
+.big{font-family:var(--h);font-size:1.3rem;text-align:center;letter-spacing:.05em}
+.letters{display:flex;gap:10px;justify-content:center}
+.top1{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.top1 .sp{min-width:56px;padding:1px 8px;font-size:.75rem}
+.kbd{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
+.mod .body>.kbd{flex:1 1 0;min-height:0;grid-auto-rows:minmax(0,1fr);max-height:150px}
+.kk{height:100%;min-height:0;align-self:stretch;border:1px solid var(--line);background:#121a23;border-radius:6px;font-weight:700;font-size:1rem;padding:0;color:var(--fg)}
+.kk.s{background:var(--amber);color:#17202B;border-color:var(--amber)}
+.spellrow{display:flex;gap:8px;justify-content:center}
+.sp{min-width:62px;text-align:center;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:#121a23;color:var(--muted);font-size:.8rem;font-weight:600}
+.sp.ok{background:rgba(79,163,106,.2);border-color:var(--green);color:var(--fg)}.sp.now{border-color:var(--amber);color:var(--amber)}
+.letters div{width:clamp(36px,3.4vw,44px);height:clamp(34px,4.6vh,44px);background:#121a23;border:2px solid var(--amber);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--h);font-size:clamp(1.5rem,2.3vw,2rem);color:var(--amber)}
+.mod input[type=text],.mod input[type=number]{text-align:center;font-family:var(--h);font-size:1.4rem;letter-spacing:.2em}
+.safe{display:flex;gap:18px;align-items:center;justify-content:center}
+.steps{display:flex;flex-direction:column;gap:7px;min-width:132px}
+.step{display:flex;gap:8px;align-items:center;font-size:.85rem;color:var(--muted)}
+.step i{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;font-size:.8rem;flex:none}
+.step.done i{background:var(--green);border-color:var(--green);color:#10200f}
+.step.done span{color:var(--fg);font-family:var(--h);font-size:1.1rem}
+.step.now i{border-color:var(--amber);color:var(--amber)}.step.now span{color:var(--fg);font-weight:700}
+.roll{width:150px;display:flex;flex-direction:column;gap:3px}
+.roll .ar{height:28px;border:1px solid var(--line);background:#121a23;border-radius:6px;color:var(--muted);touch-action:none}
+.roll .ar:active{background:var(--panel2)}
+.roll .w{height:72px;background:linear-gradient(#0c1218,#1b2733 30%,#1b2733 70%,#0c1218);border:2px solid var(--amber);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--h);font-size:3.2rem;color:var(--amber);user-select:none}
+.hint.sub span{display:inline-block}
+.hint.sub{font-size:.7rem;opacity:.6}
+.roll input.w{font:inherit;font-size:3.2rem;width:100%;min-height:0;padding:0;text-align:center;outline:none;caret-color:var(--amber);user-select:text}
+.roll input.w:focus{box-shadow:0 0 0 3px rgba(240,176,60,.35)}
+.colors{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:340px;width:100%;margin:0 auto}
+.colb{height:clamp(48px,8.5vh,70px);border-radius:10px;border:3px solid transparent;font-weight:700;font-size:.95rem;color:#111}
+.colb:active{transform:scale(.97)}
+.prog{display:flex;gap:8px;justify-content:center}
+.prog i{width:16px;height:16px;border-radius:50%;background:#121a23;border:2px solid var(--line)}
+.prog i.on{background:var(--amber);border-color:var(--amber)}
+
+.valve{white-space:nowrap;font-size:.88rem;border:2px solid var(--line);border-radius:10px;background:#121a23;padding:6px 2px;min-height:clamp(70px,11vh,96px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:700}
+.valve .no{font-family:var(--h);font-size:1.6rem;line-height:1}.valve .ab{font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.valve .st{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase}
+.valve.open{border-color:var(--green);background:rgba(79,163,106,.18)}
+.valve.open .st{color:var(--green)}
+
+.bl2{display:flex;flex-direction:column;gap:6px;flex:none}
+.bl2 .bs,.bl2 .bt{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.bl2 .lb{text-align:center;color:var(--muted);font-size:.75rem;line-height:1}
+.bl2 .slot{position:relative;height:56px;box-sizing:border-box;border:1.5px dashed var(--line);background:#121a23;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0}
+.bl2 .slot b{font-family:var(--h);font-size:1.15rem;color:var(--muted);letter-spacing:.04em}
+.bl2 .slot.has b{position:absolute;left:5px;top:2px;font-size:.62rem;color:#17202B;z-index:1}
+.bl2 .slot.over{border-color:var(--amber);background:rgba(240,176,60,.15)}
+.bl2 .slot.has{border-style:solid;border-color:var(--amber)}
+.bl2 .cell{height:46px;box-sizing:border-box;border-radius:7px}
+.bl2 .cell.empty{border:1.5px dashed var(--line);opacity:.35}
+.bl2 .chip{display:block;width:100%;height:100%;min-height:0;box-sizing:border-box;border:0;border-radius:7px;background:var(--amber);color:#17202B;font-weight:700;font-size:.68rem;line-height:1.15;padding:2px 3px;text-align:center;overflow:hidden;overflow-wrap:break-word;hyphens:auto;-webkit-hyphens:auto;cursor:grab;touch-action:none}
+.bl2 .slot .chip{padding-top:9px}
+.mod.cmp .bl2 .chip{font-size:.6rem;padding:2px 1px}.mod.cmp .bl2 .slot .chip{padding-top:9px}
+.bl2 .chip.sel{outline:2px solid #fff}
+.chip.fly{position:fixed;z-index:9999;pointer-events:none;transform:rotate(-5deg);box-shadow:0 6px 14px rgba(0,0,0,.5);height:26px;border-radius:99px;background:var(--amber);color:#17202B;font-weight:700;font-size:.85rem;padding:0 12px;display:flex;align-items:center;white-space:nowrap}
+.mod .body svg{flex:1;min-height:0;width:100%}.wr{cursor:pointer;outline:none}.wr text{font-family:var(--b);font-weight:700}.wr:focus-visible{outline:2px solid var(--amber)}
+
+
+
+
+.cta{margin-top:8px;min-height:42px;font-family:var(--h);text-transform:uppercase;letter-spacing:.08em;background:var(--red);border:0;border-radius:8px;color:#fff;font-size:1.05rem}
+.cta:hover{background:var(--red2)}
+.mod .body{--hz:26px;--gp:6px}.mod .body>.cta{margin-top:auto}.mod .body>.cta:last-child{margin-bottom:calc(var(--hz) + var(--gp))}.mod .body>.cta+.hint{flex:none;height:var(--hz);margin:0;display:flex;align-items:flex-start;justify-content:center;padding-top:4px;box-sizing:border-box}.mod .body>.hint.sub{flex:none;height:var(--hz);margin:0;display:block;text-align:center;padding-top:4px;box-sizing:border-box;line-height:1.25;font-size:.7rem}
+/* Ergebnis, Abend */
+.res .big2{font-family:var(--h);font-size:clamp(2.2rem,6vw,3.6rem);text-transform:uppercase;letter-spacing:.05em}
+.res .ok{color:var(--green)} .res .bad{color:var(--red2)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.kpi b{display:block;font-family:var(--h);font-size:2rem}
+.kpi span{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+table.t{width:100%;border-collapse:collapse}
+.btn.sm{min-height:0;padding:4px 10px;font-size:.82rem}
+td.dl{white-space:nowrap}
+#eBody td:first-child{white-space:nowrap}
+#evening .wrap{max-width:860px}
+table.t th,table.t td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+.stat-ok{color:var(--green);font-weight:700} .stat-no{color:var(--red2);font-weight:700}
+/* Einsatzunterlagen */
+#rules{background:#fff;color:#111}
+#rules .wrap{max-width:900px}
+#rules h1{color:#B8321F;font-size:2rem} #rules h2{font-size:1.25rem;margin:18px 0 6px;border-bottom:2px solid #B8321F}
+#rules p,#rules li{font-size:.95rem} #rules table{border-collapse:collapse;margin:6px 0 10px}
+#rules th,#rules td{border:1px solid #888;padding:3px 9px;text-align:left;font-size:.92rem}
+#rules th{background:#eee}
+#rules .cols{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+#rules .tools{margin-bottom:14px;display:flex;gap:10px}
+#rules .btn{background:#eee;color:#111;border-color:#aaa}
+#rules section{break-inside:avoid}
+@media print{
+  body{overflow:visible;background:#fff}
+  .screen{display:none!important}
+  body.printrules #rules{display:block!important;height:auto;overflow:visible}
+  #rules .tools{display:none}
+  @page{size:A4;margin:12mm}
+}
+
+.mod.cmp .body{padding:6px 10px;gap:4px;--hz:24px;--gp:4px}.mod.cmp .big{font-size:1.1rem}.mod.cmp .body .big{height:22px;line-height:22px}.mod.cmp .hint{font-size:.74rem;line-height:1.25}.mod.cmp .hint.sub{font-size:.7rem}
+.mod.cmp .letters div{height:48px;width:48px;font-size:2rem}.mod.cmp .top1{gap:5px}.mod.cmp .top1 .sp{min-width:62px;height:24px;line-height:20px;padding:0 8px;font-size:.88rem}.mod.cmp .kk{height:100%}
+.mod.cmp .cta{margin-top:6px;min-height:32px;font-size:.95rem}.mod.cmp .colb{height:40px}.mod.cmp .valve .no{font-size:1.3rem}
+.mod.cmp .roll .w{height:48px;font-size:2.2rem}.mod.cmp .roll .ar{height:24px}.mod.cmp .step{font-size:.8rem}.mod.cmp .steps{gap:4px}
+.mod.cmp .wires{gap:3px}
+@media (max-height:780px) and (max-width:1200px){
+ .mod .body{padding:6px 10px;gap:4px}.big{font-size:1.1rem}.mod .body .big{height:22px;line-height:22px}.hint{font-size:.74rem;line-height:1.25}
+ .letters div{height:44px;width:44px;font-size:1.7rem}.mod input[type=text]{min-height:36px;height:36px;font-size:1.15rem}
+ .cta{margin-top:6px;min-height:34px;font-size:.95rem}.mod .body{--hz:24px;--gp:4px}.colb{height:40px}.valve{min-height:58px}.valve .no{font-size:1.3rem}
+.roll .w{height:48px;font-size:2.2rem!important}.roll .ar{height:24px}.step{font-size:.8rem}.steps{gap:4px}
+.wires{gap:3px}.funk{padding:4px 14px;gap:6px 10px}.top{padding:6px 14px}.clock{font-size:2.2rem}
+}
+@media (max-width:820px){.top{grid-template-columns:1fr auto}.top .r{grid-column:1/-1;justify-content:space-between}}
+
+.mod .body>.cta{margin-top:auto!important}.mod .body>.kbd{margin-bottom:6px}.mod .body>.colors{flex:1;align-content:center}
+</style>
+</head>
+<body>
+
+<!-- START -->
+<section id="start" class="screen on">
+  <div class="stripe"></div>
+  <div class="wrap">
+    <div class="brand"><h1>Funkübung</h1><span>ELW</span></div>
+    <p class="lead">Die genaue Aufgabenstellung kennen nur die Einheiten, sie steht in ihren Einsatzunterlagen. Die Kommunikatoren ELW geben die Meldungen der Einheiten am Bildschirm ein, die App wertet sie aus. Gelöst wird allein über Funk.</p>
+
+    <div class="card">
+      <label class="f" for="team1">Kommunikatoren im ELW</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><input type="text" id="team1" placeholder="Name Kommunikator 1 *" autocomplete="off"><input type="text" id="team2" placeholder="Name Kommunikator 2" autocomplete="off"></div>
+    </div>
+
+    <div class="card">
+      <label class="f">Anzahl Module</label>
+      <div class="seg" id="segN"><button data-v="2">2</button><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button></div>
+    </div>
+
+    <details class="card" id="settings">
+      <summary>Einstellungen <i class="plsub u">(nur Übungsleiter)</i></summary>
+      <div class="inner">
+        <div style="grid-column:1/-1">
+          <div class="lab"><label class="f">Einheiten im Einsatz</label><span class="cnt2" id="truppCnt"></span></div>
+          <div class="chips" id="truppChips"></div>
+        </div>
+        <div>
+          <label class="f">BOS-Kennung anzeigen</label>
+          <div class="seg" id="segR"><button data-v="voll" class="on">Ausgeschrieben</button><button data-v="kurz">Fl.</button></div>
+          <div class="hint sub" style="text-align:left;margin-top:4px">Nur am Bildschirm, zum Beispiel Fl. Aidlingen 43</div>
+        </div>
+        <div>
+          <label class="f">Buchstabieren</label>
+          <div class="seg" id="segB"><button data-v="zufall" class="on">Zufall</button><button data-v="woerter">Wörter</button></div>
+        </div>
+        <div>
+          <label class="f">Ton</label>
+          <div class="seg" id="segSound"><button data-v="1" class="on">An</button><button data-v="0">Aus</button></div>
+        </div>
+        <div>
+          <label class="f">Zeitmodus</label>
+          <div class="seg" id="segMode"><button data-v="limit" class="on">Zeitlimit</button><button data-v="up">Stoppuhr</button></div>
+        </div>
+        <div id="limitBox">
+          <label class="f" for="limit">Zeitlimit</label>
+          <div class="unit"><input type="number" id="limit" min="1" max="120" value="15" inputmode="numeric"><span>Minuten</span></div>
+        </div>
+        <div>
+          <label class="f" for="pen">Strafzeit je Fehler</label>
+          <div class="unit"><input type="number" id="pen" min="0" max="120" value="15" inputmode="numeric"><span>Sekunden</span></div>
+        </div>
+        <div style="grid-column:span 2">
+          <label class="f">Module je Einheit</label>
+          <div class="seg" id="segM"><button data-v="versch" class="on">Verschieden</button><button data-v="gleich">Gleich, gemischt</button></div>
+          <div class="hint sub" style="text-align:left;margin-top:4px">Gleich: alle Einheiten bekommen dieselben Module, nur in anderer Reihenfolge (fair vergleichbar)</div>
+        </div>
+        <div>
+          <label class="f" for="fixnr">Feste Einsatz-Nr.</label>
+          <div class="unit"><input type="text" id="fixnr" placeholder="optional" autocomplete="off"></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="card plbox" id="plBox" open>
+      <summary>Zum Ausdrucken <i class="plsub">(Übungsvorbereitung)</i> <span id="plSum" class="plsum"></span></summary>
+      <div class="plin">
+        <div id="plList"></div>
+        <div class="plfoot"><span id="plCnt" class="plcnt"></span><button class="btn ghost" id="plAll">Beide öffnen</button></div>
+      </div>
+    </details>
+
+    <div class="nextnr">
+      <button class="btn primary" id="go">Funkübung beginnen</button>
+      <div><span class="hint">Nächste Einsatz-Nr.</span><div class="nr" id="nextNr"></div></div>
+    </div>
+
+    <div class="links">
+      <button class="btn ghost" id="toEvening">Abendauswertung</button>
+    </div>
+  </div>
+</section>
+
+<!-- SPIEL -->
+<section id="game" class="screen">
+  <div>
+    <div class="top">
+      <div class="l"><div class="nr" id="gNr"></div><div class="team" id="gTeam"></div></div>
+      <div class="clock" id="clock">00:00<small id="clockLbl">Restzeit</small><span class="pen" id="penFlash"></span></div>
+      <div class="r">
+        <div class="hpill"><span>Module</span><b id="gSolved">0/0</b></div>
+        <div class="hpill" id="gErrP"><span>Fehler</span><b id="gErr">0</b></div>
+        <button class="btn ghost" id="gSound" aria-label="Ton"></button>
+        <button class="btn ghost" id="gAbort" aria-label="Abbrechen"></button>
+      </div>
+    </div>
+    <div class="funk" id="funkBar"></div>
+  </div>
+  <div class="gamebody"><div class="grid" id="grid"></div></div>
+</section>
+
+<!-- ERGEBNIS -->
+<section id="result" class="screen res">
+  <div class="stripe"></div>
+  <div class="wrap">
+    <div class="cond" style="color:var(--amber)" id="rNr"></div>
+    <div class="big2" id="rHead"></div>
+    <div class="hint" style="text-align:left" id="rTeam"></div>
+    <div class="kpis">
+      <div class="kpi"><b id="rTime"></b><span>Gesamtzeit</span></div>
+      <div class="kpi"><b id="rErr"></b><span>Fehler</span></div>
+      <div class="kpi"><b id="rMods"></b><span>Module gelöst</span></div>
+    </div>
+    <div class="card"><table class="t"><thead><tr><th>Modul</th><th>Ergebnis</th><th>Fehler</th><th>Gelöst nach</th></tr></thead><tbody id="rBody"></tbody></table></div>
+    <div class="links" style="margin-bottom:10px">
+      <button class="btn primary" id="rAgain" style="font-size:1.1rem;padding:10px 20px">Nächste Gruppe</button>
+      <button class="btn" id="rHome">Startseite</button>
+    </div>
+    <div class="links">
+      <button class="btn ghost" id="rPdf">Runde als PDF</button>
+      <button class="btn ghost" id="rJpg">Runde als JPG</button>
+      <button class="btn ghost" id="rEve">Abendauswertung</button>
+    </div>
+  </div>
+</section>
+
+<!-- ABEND -->
+<section id="evening" class="screen res">
+  <div class="stripe"></div>
+  <div class="wrap">
+    <div class="brand"><h1>Abendauswertung</h1></div>
+    <div class="hint" style="text-align:left" id="eDate"></div>
+    <div class="card"><table class="t"><thead><tr><th>Einsatz-Nr.</th><th>Team</th><th>Ergebnis</th><th>Zeit</th><th>Fehler</th><th>Module</th><th>Download</th></tr></thead><tbody id="eBody"></tbody></table><div class="hint" id="eEmpty" style="display:none;padding:14px">Heute wurde noch keine Runde gespielt.</div></div>
+    <div class="links">
+      <button class="btn primary" id="ePdf" style="font-size:1.1rem;padding:10px 20px">Abend als PDF</button>
+      <button class="btn" id="eBack">Zurück</button>
+      <button class="btn ghost" id="eClear">Abend zurücksetzen</button>
+    </div>
+  </div>
+</section>
+
+<!-- EINSATZUNTERLAGEN -->
+<section id="rules" class="screen">
+  <div class="wrap">
+    <div class="tools"><button class="btn" id="rlPrint">PDF öffnen</button><button class="btn" id="rlBack">Zurück</button></div>
+    <div id="rlBody"></div>
+  </div>
+</section>
+
+<script>
+'use strict';
+/* =========================================================
+   DATENBLOCK: alle Inhalte sind fiktiv und hier gesammelt.
+   Rufnamen, Tabellen und Texte lassen sich ohne Eingriff ins Programm ändern.
+   ========================================================= */
+const DATA = {
+  elw: { nummer: '11' },
+  trupps: ['33', '43', '44', '65', '74', '19/1', '19/2', '00'],
+  funk: {
+    TMO: { gruppe: 'FW BB LG AID', kurzwahl: '1460', prefix: 'Florian' },
+    DMO: { gruppe: '308_F*', kurzwahl: '308', prefix: 'Florentine' }
+  },
+  ort: 'Aidlingen',
+  // Buchstabiertafel nach DIN 5009:1996-12 (rotes Heft, BW)
+  buchstabiertafel: {
+    A:'Anton', Ä:'Ärger', B:'Berta', C:'Cäsar', Ch:'Charlotte', D:'Dora', E:'Emil', F:'Friedrich', G:'Gustav',
+    H:'Heinrich', I:'Ida', J:'Julius', K:'Kaufmann', L:'Ludwig', M:'Martha', N:'Nordpol', O:'Otto', Ö:'Ökonom',
+    P:'Paula', Q:'Quelle', R:'Richard', S:'Samuel', Sch:'Schule', 'ß':'Eszett', T:'Theodor', U:'Ulrich', Ü:'Übermut',
+    V:'Viktor', W:'Wilhelm', X:'Xanthippe', Y:'Ypsilon', Z:'Zacharias'
+  },
+  ziffern: ['null','eins','zwoh','drai','viär','fünnef','sechs','sibähn','acht','noin'],
+  farben: {
+    Rot:   { hex:'#D9442F' },
+    Gelb:  { hex:'#F0B03C' },
+    Grün:  { hex:'#4FA36A' },
+    Blau:  { hex:'#4C86D6' },
+    Weiß:  { hex:'#EDE9DF' }
+  },
+  // Modul 1: Freigabetabelle, jeder Buchstabe hat einen Freigabebuchstaben
+  freigabe: { A:'K',B:'R',C:'W',D:'F',E:'T',F:'L',G:'P',H:'B',I:'X',J:'D',K:'N',L:'S',M:'Z',N:'H',O:'V',P:'C',Q:'J',R:'E',S:'A',T:'Q',U:'G',V:'Y',W:'M',X:'O',Y:'U',Z:'I' },
+  // Modul 1 im Modus Wörter: Wörter mit vier Buchstaben, ohne Umlaute, beliebig erweiterbar
+  woerter: ['HOSE','ROHR','HELM','BEIL','SEIL','HAKE','GURT','KEIL','ZELT','BOOT','KRAN','LUFT','LAGE','BAND','GIFT','GLUT','NASS','RUSS','WIND','TEAM','DACH','WAND','TUER','TORE','HAUS','FUNK','VOLT','AKKU','LEER','OFEN'],
+  // Modul 2: Alarmtableau, Tastenreihenfolge je Alarmstufe
+  serien: {
+    1:['Rot','Blau','Gelb','Grün'], 2:['Gelb','Grün','Rot','Blau'], 3:['Blau','Rot','Grün','Gelb'],
+    4:['Grün','Gelb','Blau','Rot'], 5:['Rot','Gelb','Blau','Grün'], 6:['Blau','Grün','Gelb','Rot']
+  },
+  // Modul 3: Welche Abgänge je Lage geöffnet sein müssen
+  lagen: {
+    1:{ name:'Kellerbrand',  auf:[1,4] },   2:{ name:'Dachstuhl',    auf:[2,3,5] },
+    3:{ name:'Lagerhalle',   auf:[1,2] },   4:{ name:'Tiefgarage',   auf:[3,4,5] },
+    5:{ name:'Hochhaus',     auf:[1,3,5] }, 6:{ name:'Waldrand',     auf:[2,4] }
+  },
+  // Modul 4: Tresorcode je Depot
+  depots: { 'Seniorenheim':[17,42,8], 'Autowerkstatt':[63,5,29], 'Schallenberg Schule':[34,81,56], 'Aussiedlerhof':[90,12,47], 'Diak. Mutterhaus':[26,73,38], 'Rewe':[51,64,9] },
+  // Modul 5: Beladeplan je Fahrzeug (Geräteraum 1 bis 5)
+  geraete: ['Tauchpumpe','Motorkettensäge','Wärmebildkamera','Überdrucklüfter','Hohlstrahlrohr'],
+  fahrzeuge: {
+    'LF 20':    { 'Tauchpumpe':3, 'Motorkettensäge':1, 'Wärmebildkamera':5, 'Überdrucklüfter':2, 'Hohlstrahlrohr':4 },
+    'HLF 10':   { 'Tauchpumpe':2, 'Motorkettensäge':4, 'Wärmebildkamera':1, 'Überdrucklüfter':5, 'Hohlstrahlrohr':3 },
+    'TLF 3000': { 'Tauchpumpe':5, 'Motorkettensäge':3, 'Wärmebildkamera':2, 'Überdrucklüfter':1, 'Hohlstrahlrohr':4 }
+  },
+  // Modul 6: Rettungskarte (Modelle real, Farbzuordnung nur für die Übung): erste Farbe durchtrennen, fehlt sie, die zweite
+  modelle: {
+    'Tesla Model 3':['Gelb','Blau'], 'VW ID.3':['Rot','Grün'], 'Renault Zoe':['Blau','Weiß'],
+    'BMW i3':['Grün','Gelb'], 'Hyundai Ioniq 5':['Weiß','Rot'], 'Kia EV6':['Rot','Blau']
+  }
+};
+
+/* ---------- Hilfen ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const pad = n => String(n).padStart(2, '0');
+const fmt = s => { s = Math.max(0, Math.round(s)); return pad(Math.floor(s / 60)) + ':' + pad(s % 60); };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const mem = {};
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); if (v !== null) return JSON.parse(v); } catch (e) {} return k in mem ? mem[k] : d; },
+  set(k, v) { mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+function today() { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+
+function xmur3(str) { let h = 1779033703 ^ str.length; for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; } return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return (h ^= h >>> 16) >>> 0; }; }
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function makeRng(seedStr) {
+  const r = mulberry32(xmur3(seedStr)());
+  const o = { next: r, int: n => Math.floor(r() * n), pick: a => a[Math.floor(r() * a.length)],
+    shuffle: a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; } };
+  return o;
+}
+
+/* ---------- Ton ---------- */
+let actx = null, soundOn = true;
+function audio() { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); } catch (e) {} return actx; }
+function tone(freq, dur, type, vol, delay = 0) {
+  if (!soundOn) return; const c = audio(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + delay;
+  o.type = type; o.frequency.value = freq; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .02);
+}
+const ICON_ON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+const ICON_OFF = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M17 9.5l5 5M22 9.5l-5 5"/></svg>';
+function paintSound() { const b = $('#gSound'); b.innerHTML = soundOn ? ICON_ON : ICON_OFF; b.dataset.tip = soundOn ? 'Ton ist an (antippen zum Ausschalten)' : 'Ton ist aus (antippen zum Einschalten)'; b.removeAttribute('title'); b.setAttribute('aria-label', b.dataset.tip); b.classList.toggle('off', !soundOn); }
+const sndStart = () => { tone(196, 1.4, 'sine', .35); tone(294, 1.2, 'sine', .22, .02); tone(392, 1.0, 'sine', .12, .04); };
+const sndErr = () => { tone(150, .28, 'square', .12); tone(120, .28, 'square', .12, .18); };
+const sndWarn = th => { const n = th === 90 ? 1 : th === 60 ? 2 : 3, f = th === 30 ? 1320 : 1040; for (let i = 0; i < n; i++) tone(f, .14, 'sine', .28, i * .24); };
+const sndOk = () => { tone(660, .15, 'sine', .2); tone(880, .25, 'sine', .2, .12); };
+
+/* =========================================================
+   MODULE
+   mount(root, st, api): api.err() zählt Fehler, api.done() meldet gelöst
+   ========================================================= */
+const MODULES = [];
+
+// 1 Funkspruch buchstabieren
+MODULES.push({
+  id: 'buchstabieren', name: 'Funkspruch buchstabieren',
+  make(r, cfg) { if (cfg && cfg.bmode === 'woerter') return { letters: r.pick(DATA.woerter).split(''), pos: 0 }; const L = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; const pick = r.shuffle(L.split('')).slice(0, 4); return { letters: pick, pos: 0 }; },
+  mount(root, st, api) {
+    st.sel = '';
+    const KEYS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const mark = () => $$('.kk', root).forEach(b => b.classList.toggle('s', b.dataset.k === st.sel));
+    const check = () => {
+      const l = st.letters[st.pos];
+      if (!st.sel) return;
+      if (st.sel === DATA.freigabe[l]) { st.sel = ''; st.pos++; if (st.pos >= st.letters.length) { st.pos = st.letters.length - 1; api.done(); } else draw(); }
+      else { st.sel = ''; api.err(); mark(); }
+    };
+    const draw = () => {
+      const l = st.letters[st.pos];
+      root.innerHTML = `<div class="top1"><div class="letters"><div>${l}</div></div>
+        <div class="spellrow">${st.letters.map((x, i) => `<span class="sp ${i < st.pos ? 'ok' : i === st.pos ? 'now' : ''}">${i < st.pos ? x + ' ' + DATA.freigabe[x] : i === st.pos ? '?' : '-'}</span>`).join('')}</div></div>
+        <div class="kbd">${KEYS.map(k => `<button class="kk" data-k="${k}">${k}</button>`).join('')}</div>
+        <button class="cta">Prüfen</button>
+        <div class="hint sub"><span>Buchstabe antippen</span> <span>oder über die Tastatur eintippen</span></div>`;
+      $$('.kk', root).forEach(b => b.onclick = () => { st.sel = b.dataset.k; mark(); });
+      $('.cta', root).onclick = check; mark();
+    };
+    const onKey = e => {
+      if (!root.isConnected) { window.removeEventListener('keydown', onKey); return; }
+      if (typeof G !== 'undefined' && G && G.activeBuch && G.activeBuch !== root.closest('.mod')) return;
+      if (root.closest('.tbox.tlock')) return;
+      const t = document.activeElement; if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT')) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (/^[a-zA-Z]$/.test(e.key)) { st.sel = e.key.toUpperCase(); mark(); }
+      else if (e.key === 'Enter' && !(t && t.tagName === 'BUTTON')) check();
+    };
+    window.addEventListener('keydown', onKey);
+    draw();
+  },
+  rules() {
+    const rows = Object.keys(DATA.freigabe);
+    return `<p>Die Buchstaben sind je nach Einstellung zufällig oder ergeben ein Wort mit vier Buchstaben. Die Kommunikatoren ELW sehen immer nur einen Buchstaben und buchstabieren ihn nach Buchstabiertafel. Die Einheiten nennen den zugehörigen Buchstaben aus der Freigabetabelle, ebenfalls nach Buchstabiertafel. Ist er richtig, erscheint der nächste Buchstabe. </p>
+    <table><tr><th class="ctr lab">Gezeigt</th>${rows.map(l => `<th class="ctr">${l}</th>`).join('')}</tr><tr><td class="ctr lab"><b>Freigabe</b></td>${rows.map(l => `<td class="ctr">${DATA.freigabe[l]}</td>`).join('')}</tr></table>`;
+  }
+});
+
+// 2 Farbtasten
+MODULES.push({
+  id: 'farbtasten', name: 'Alarmtableau',
+  make(r) { return { serie: 1 + r.int(6), order: r.shuffle(['Rot','Gelb','Grün','Blau']), pos: 0 }; },
+  mount(root, st, api) {
+    const seq = DATA.serien[st.serie];
+    const draw = () => {
+      root.innerHTML = `<div class="big">Alarmstufe ${st.serie}</div>
+        <div class="prog">${seq.map((_, i) => `<i class="${i < st.pos ? 'on' : ''}"></i>`).join('')}</div>
+        <div class="colors">${st.order.map(c => `<button class="colb" data-c="${c}" style="background:${DATA.farben[c].hex}">${c}</button>`).join('')}</div>
+        <div class="hint sub"><span>Farbtasten antippen</span> <span>in der genannten Reihenfolge</span></div>`;
+      $$('.colb', root).forEach(b => b.onclick = () => {
+        if (b.dataset.c === seq[st.pos]) { st.pos++; if (st.pos >= seq.length) api.done(); else draw(); }
+        else { st.pos = 0; api.err(); draw(); }
+      });
+    };
+    draw();
+  },
+  rules() {
+    return `<p>Die Kommunikatoren ELW nennen die Alarmstufe. Die Tasten am Alarmtableau sind in dieser Reihenfolge zu drücken:</p>
+    <table><tr><th>Alarmstufe</th><th class="ctr">1. Taste</th><th class="ctr">2. Taste</th><th class="ctr">3. Taste</th><th class="ctr">4. Taste</th></tr>${Object.keys(DATA.serien).map(s => `<tr><td>Alarmstufe ${s}</td>${DATA.serien[s].map(c => `<td class="ctr" data-col="${c}"><b>${c}</b></td>`).join('')}</tr>`).join('')}</table>`;
+  }
+});
+
+// 3 Wasserversorgung
+MODULES.push({
+  id: 'wasser', name: 'Wasserversorgung',
+  make(r) { return { lage: 1 + r.int(6), open: [0,1,2,3,4].map(() => r.int(2) === 1) }; },
+  mount(root, st, api) {
+    const L = DATA.lagen[st.lage];
+    const draw = () => {
+      root.innerHTML = `<div class="big"><i>Lage ${st.lage}:</i> ${esc(L.name)}</div>
+        <svg viewBox="0 56 420 128" role="group" aria-label="Verteiler mit fünf Abgängen">
+          <rect x="4" y="68" width="48" height="50" rx="6" fill="#4C86D6"/><text x="28" y="97" fill="#fff" font-size="11" text-anchor="middle">PUMPE</text>
+          <rect x="52" y="87" width="362" height="14" fill="#3A4A5C"/>
+          ${st.open.map((o, i) => { const x = 100 + i * 68, c = o ? '#4FA36A' : '#8795A5'; return `<g class="valve ${o ? 'open' : ''}" data-i="${i}" transform="translate(${x},0)" role="button" tabindex="0" aria-label="Abgang ${i + 1} ${o ? 'offen' : 'zu'}" style="cursor:pointer;outline:none">
+            <rect x="-33" y="56" width="66" height="128" fill="transparent"/>
+            <rect x="-9" y="101" width="18" height="30" fill="#3A4A5C"/>
+            <circle cx="0" cy="94" r="14" fill="#121a23" stroke="${c}" stroke-width="3.5"/>
+            ${o ? `<rect x="-30" y="89" width="60" height="10" rx="5" fill="${c}"/>` : `<rect x="-5" y="62" width="10" height="64" rx="5" fill="${c}"/>`}
+            <text y="152" fill="#fff" font-size="20" text-anchor="middle">${i + 1}</text>
+            <text y="173" fill="${c}" font-size="12" text-anchor="middle">${o ? 'offen' : 'zu'}</text></g>`; }).join('')}
+        </svg>
+        <button class="cta">Wasser marsch</button>
+        <div class="hint sub"><span>Hebel antippen</span> <span>zum Öffnen oder Schließen des Abgangs</span></div>`;
+      $$('.valve', root).forEach(b => { const t = () => { st.open[+b.dataset.i] = !st.open[+b.dataset.i]; draw(); }; b.onclick = t; b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t(); } }; });
+      $('.cta', root).onclick = () => {
+        const want = [1,2,3,4,5].map(n => L.auf.includes(n));
+        if (want.every((w, i) => w === st.open[i])) api.done(); else api.err();
+      };
+    };
+    draw();
+  },
+  rules() {
+    return `<p>Der Verteiler hat fünf Abgänge. Die Kommunikatoren ELW nennen die Lage. Die Einheit nennt die Abgänge, die in dieser Lage zu öffnen sind, alle anderen bleiben zu. Die Kommunikatoren ELW stellen die Hebel entsprechend und lösen mit "Wasser marsch" aus.</p>
+    <table><tr><th class="ctr">Lage</th><th>Einsatzort</th>${[1, 2, 3, 4, 5].map(n => `<th class="ctr">Abgang ${n}</th>`).join('')}</tr>${Object.keys(DATA.lagen).map(k => `<tr><td class="ctr">${k}</td><td>${esc(DATA.lagen[k].name)}</td>${[1, 2, 3, 4, 5].map(n => DATA.lagen[k].auf.includes(n) ? '<td class="ctr"><b>offen</b></td>' : '<td class="ctr">zu</td>').join('')}</tr>`).join('')}</table>`;
+  }
+});
+
+// 4 Schlüsseldepot
+MODULES.push({
+  id: 'depot', name: 'Schlüsseldepot',
+  make(r) { return { depot: r.pick(Object.keys(DATA.depots)) }; },
+  mount(root, st, api) {
+    const code = DATA.depots[st.depot];
+    st.step = 0; st.val = 0;
+    root.innerHTML = `<div class="big"><i>Objekt:</i> ${st.depot}</div>
+      <div class="safe"><div class="steps"></div>
+        <div class="roll"><button class="ar up" aria-label="Zahl erhöhen">▲</button><input class="w" type="text" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Zahl" value="00"><button class="ar dn" aria-label="Zahl verringern">▼</button></div></div>
+      <button class="cta">Bestätigen</button>
+      <div class="hint sub"><span>Zahl mit ▲▼ wählen</span> <span>oder über die Tastatur eintippen</span></div>`;
+    const w = $('.w', root), steps = $('.steps', root);
+    const drawSteps = () => { steps.innerHTML = [0, 1, 2].map(i => `<div class="step ${i < st.step ? 'done' : i === st.step ? 'now' : ''}"><i>${i + 1}</i><span>${i < st.step ? pad(code[i]) : i === st.step ? 'Zahl eingeben' : 'Zahl'}</span></div>`).join(''); };
+    const setVal = v => { st.val = (v + 100) % 100; w.value = pad(st.val); };
+    const hold = (btn, d) => {
+      let t1, t2; const stop = () => { clearTimeout(t1); clearInterval(t2); };
+      btn.addEventListener('pointerdown', e => { e.preventDefault(); setVal(st.val + d); t1 = setTimeout(() => { t2 = setInterval(() => setVal(st.val + d), 80); }, 400); });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+    };
+    hold($('.up', root), 1); hold($('.dn', root), -1);
+    let buf = '', last = 0;
+    const confirm = () => {
+      if (st.val === code[st.step]) { st.step++; if (st.step >= 3) { drawSteps(); api.done(); return; } setVal(0); drawSteps(); }
+      else api.err();
+    };
+    root.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp') { setVal(st.val + 1); e.preventDefault(); }
+      else if (e.key === 'ArrowDown') { setVal(st.val - 1); e.preventDefault(); }
+      else if (e.key === 'Enter') confirm();
+    });
+    w.addEventListener('focus', () => w.select());
+    w.addEventListener('click', () => w.select());
+    w.addEventListener('input', () => { w.value = w.value.replace(/\D/g, '').slice(0, 2); st.val = parseInt(w.value || '0', 10); });
+    w.addEventListener('blur', () => setVal(st.val));
+    $('.cta', root).onclick = () => { setVal(st.val); confirm(); };
+    drawSteps();
+  },
+  rules() {
+    return `<p>Die Kommunikatoren ELW nennen das Objekt (fiktiv) mit dem Schlüsseldepot. Die Zahlen werden einzeln nach Funkregeln gesprochen, zum Beispiel 17 als "eins, sibähn".</p>
+    <table><tr><th>Objekt</th><th class="ctr">1. Zahl</th><th class="ctr">2. Zahl</th><th class="ctr">3. Zahl</th></tr>${Object.keys(DATA.depots).map(k => `<tr><td>${k}</td>${DATA.depots[k].map(n => `<td class="ctr">${pad(n)}</td>`).join('')}</tr>`).join('')}</table>`;
+  }
+});
+
+// 5 Beladung
+MODULES.push({
+  id: 'beladung', name: 'Beladung',
+  make(r) { return { fz: r.pick(Object.keys(DATA.fahrzeuge)), geraete: r.shuffle(DATA.geraete), sel: {} }; },
+  mount(root, st, api) {
+    let pick = null;
+    const at = n => Object.keys(st.sel).find(g => st.sel[g] === n);
+    const chip = g => `<button class="chip${pick === g ? ' sel' : ''}" data-g="${esc(g)}">${esc(g)}</button>`;
+    const draw = () => {
+      root.innerHTML = `<div class="big">Fahrzeug ${esc(st.fz)}</div>
+        <div class="bl2"><div class="bs">${st.geraete.map((g, i) => { const n = i + 1, o = at(n); return `<div class="slot${o ? ' has' : ''}" data-n="${n}"><b>G${n}</b>${o ? chip(o) : ''}</div>`; }).join('')}</div>
+          <div class="lb">Geräte</div>
+          <div class="bt">${st.geraete.map(g => `<div class="cell${st.sel[g] ? ' empty' : ''}">${st.sel[g] ? '' : chip(g)}</div>`).join('')}</div></div>
+        <button class="cta">Beladen</button>
+        <div class="hint sub"><span>Gerät in den Raum ziehen</span> <span>oder beide nacheinander antippen</span></div>`;
+      $('.cta', root).onclick = () => {
+        const plan = DATA.fahrzeuge[st.fz];
+        if (st.geraete.every(g => st.sel[g] === plan[g])) api.done(); else api.err();
+      };
+      $$('.chip', root).forEach(c => c.onpointerdown = e => grab(e, c));
+      $$('.slot', root).forEach(sl => sl.onclick = e => { if (pick && !e.target.closest('.chip')) { put(pick, +sl.dataset.n); pick = null; draw(); } });
+    };
+    const put = (g, n) => {
+      const o = at(n);
+      if (o && o !== g) delete st.sel[o];
+      st.sel[g] = n;
+    };
+    const grab = (e, c) => {
+      if (e.button) return;
+      e.preventDefault();
+      const g = c.dataset.g, x0 = e.clientX, y0 = e.clientY, id = e.pointerId;
+      let fly = null, moved = false;
+      const move = ev => {
+        if (ev.pointerId !== id) return;
+        if (!moved && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
+        if (!moved) { moved = true; fly = document.createElement('div'); fly.className = 'chip fly'; fly.textContent = g; document.body.appendChild(fly); c.style.opacity = '.3'; }
+        fly.style.left = (ev.clientX - 30) + 'px'; fly.style.top = (ev.clientY - 14) + 'px';
+        $$('.slot', root).forEach(sl => { const r = sl.getBoundingClientRect(); sl.classList.toggle('over', ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom); });
+      };
+      const up = ev => {
+        if (ev.pointerId !== id) return;
+        window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
+        if (fly) fly.remove();
+        if (!moved) {
+          if (st.sel[g]) delete st.sel[g]; else pick = pick === g ? null : g;
+        } else {
+          const t = $$('.slot', root).find(sl => sl.classList.contains('over'));
+          if (t) put(g, +t.dataset.n); else delete st.sel[g];
+          pick = null;
+        }
+        draw();
+      };
+      window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+    };
+    draw();
+  },
+  rules() {
+    const fz = Object.keys(DATA.fahrzeuge);
+    return `<p>Jedes Gerät gehört nach Beladeplan in einen Geräteraum (G1 bis G5). Die Kommunikatoren ELW nennen das Fahrzeug und ein Gerät, die Einheit nennt den zugehörigen Geräteraum. Die Kommunikatoren ELW ziehen das Gerät am Bildschirm in den Raum und lösen am Ende mit "Beladen" aus.</p>
+    <table><tr><th>Gerät</th>${fz.map(f => `<th class="ctr">${f}</th>`).join('')}</tr>${DATA.geraete.map(g => `<tr><td>${g}</td>${fz.map(f => `<td class="ctr">G${DATA.fahrzeuge[f][g]}</td>`).join('')}</tr>`).join('')}</table>`;
+  }
+});
+
+// 6 Strom trennen
+MODULES.push({
+  id: 'strom', name: 'Strom trennen',
+  make(r) {
+    const names = Object.keys(DATA.modelle), cols = Object.keys(DATA.farben);
+    for (let k = 0; k < 50; k++) {
+      const modell = r.pick(names), wires = r.shuffle(cols).slice(0, 4), [a, b] = DATA.modelle[modell];
+      if (wires.includes(a) || wires.includes(b)) return { modell, wires, cut: [], target: wires.includes(a) ? a : b };
+    }
+    return { modell: 'VW ID.3', wires: ['Rot','Gelb','Grün','Blau'], cut: [], target: 'Rot' };
+  },
+  mount(root, st, api) {
+    const draw = () => {
+      const ys = [34, 74, 114, 154];
+      const lines = st.wires.map((c, i) => {
+        const y = ys[i], hex = DATA.farben[c].hex, cut = st.cut.includes(c);
+        const path = cut ? `M40 ${y}H196M244 ${y}H330` : `M40 ${y}H330`;
+        return `<g class="wr ${cut ? 'cut' : ''}" data-c="${c}" role="button" aria-label="${c} durchtrennen" tabindex="0">
+          <rect x="40" y="${y - 20}" width="300" height="40" fill="transparent"/>
+          <path d="${path}" fill="none" stroke="${hex}" stroke-width="10" stroke-linecap="round"/>
+          ${cut ? `<text x="220" y="${y + 4}" fill="var(--red2)" font-size="11" text-anchor="middle">getrennt</text>` : `<circle cx="220" cy="${y}" r="17" fill="#17202B" stroke="#F0B03C" stroke-width="2"/><text x="220" y="${y + 6}" fill="#F0B03C" font-size="17" text-anchor="middle">✂</text>`}
+          <text x="345" y="${y + 4}" fill="#F5F2EB" font-size="12">${c}</text></g>`;
+      }).join('');
+      root.innerHTML = `<div class="big">${esc(st.modell)}</div>
+        <svg viewBox="0 0 400 188" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Leitungen">
+          <rect x="6" y="14" width="34" height="160" rx="8" fill="#121a23" stroke="#3A4A5C" stroke-width="2"/>
+          <text x="23" y="94" fill="#C9D1DA" font-size="11" text-anchor="middle" transform="rotate(-90 23 94)">BATTERIE</text>${lines}</svg>
+        <div class="hint sub"><span>Schere antippen,</span> <span>um die Leitung zu trennen</span></div>`;
+      $$('.wr', root).forEach(g => {
+        const act = () => {
+          if (st.cut.includes(g.dataset.c)) return;
+          if (g.dataset.c === st.target) { st.cut.push(g.dataset.c); draw(); api.done(); } else api.err();
+        };
+        g.onclick = act; g.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); } };
+      });
+    };
+    draw();
+  },
+  rules() {
+    return `<p>Übungs-Rettungskarte mit echten Fahrzeugmodellen. Die Farbzuordnung ist frei gewählt und entspricht nicht den echten Rettungskarten der Hersteller. Durchtrennt wird die Leitung in der ersten Farbe. Ist sie nicht vorhanden, gilt die zweite Farbe. Die Kommunikatoren ELW nennen das Modell und beschreiben die Leitungen.</p>
+    <table><tr><th>Modell</th><th class="ctr">Erste Wahl</th><th class="ctr">Ersatz</th></tr>${Object.keys(DATA.modelle).map(m => `<tr><td>${m}</td>${DATA.modelle[m].map(c => `<td class="ctr" data-col="${c}"><b>${c}</b></td>`).join('')}</tr>`).join('')}</table>`;
+  }
+});
+
+/* =========================================================
+   Einstellungen und Startseite
+   ========================================================= */
+const S = Object.assign({ team: '', mode: 'limit', limit: 15, pen: 15, fixnr: '', trupps: ['43', '44'], sound: 1, bmode: 'zufall', mset: 'versch', rn: 'voll', n: 6, team1: '', team2: '' }, store.get('funks_settings', {}));
+function saveS() { store.set('funks_settings', S); }
+function seqToday() { return store.get('funks_seq_' + today(), 0); }
+function nextNr() { return today() + '_' + String(seqToday() + 1).padStart(3, '0'); }
+
+function show(id) { $$('.screen').forEach(s => s.classList.toggle('on', s.id === id)); if (id !== 'rules') document.body.classList.remove('printrules'); window.scrollTo(0, 0); }
+
+function initStart() {
+  $('#team1').value = S.team1 || ''; $('#team2').value = S.team2 || '';
+  $('#limit').value = S.limit; $('#pen').value = S.pen; $('#fixnr').value = S.fixnr;
+  setSeg('#segN', String(S.n));
+  setSeg('#segMode', S.mode); setSeg('#segSound', String(S.sound)); setSeg('#segB', S.bmode); setSeg('#segM', S.mset); setSeg('#segR', S.rn);
+  $('#limitBox').style.visibility = S.mode === 'limit' ? 'visible' : 'hidden';
+  $('#truppChips').innerHTML = DATA.trupps.map(t => `<button class="chip ${S.trupps.includes(t) ? 'on' : ''}" data-t="${t}">${DATA.ort} ${t}</button>`).join('');
+  $('#truppCnt').innerHTML = '<b>' + S.trupps.length + '</b> von 2 gewählt';
+  $('#nextNr').textContent = nextNr();
+  const n = store.get('funks_runden_' + today(), []).length;
+  $('#toEvening').textContent = 'Abendauswertung' + (n ? ' (' + n + ' Runde' + (n > 1 ? 'n' : '') + ')' : '');
+}
+function setSeg(sel, v) { $$(sel + ' button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); }
+
+$('#segMode').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.mode = b.dataset.v; setSeg('#segMode', S.mode); $('#limitBox').style.visibility = S.mode === 'limit' ? 'visible' : 'hidden'; saveS(); };
+$('#segSound').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.sound = +b.dataset.v; soundOn = !!S.sound; setSeg('#segSound', String(S.sound)); saveS(); if (S.sound) { audio(); sndOk(); } };
+$('#truppChips').onclick = e => {
+  const b = e.target.closest('.chip'); if (!b) return; const t = b.dataset.t;
+  if (S.trupps.includes(t)) { if (S.trupps.length > 1) S.trupps = S.trupps.filter(x => x !== t); }
+  else { S.trupps.push(t); if (S.trupps.length > 2) S.trupps.shift(); }
+  initStart(); saveS();
+};
+['team1', 'team2', 'limit', 'pen', 'fixnr'].forEach(id => $('#' + id).addEventListener('input', () => {
+  S.team1 = $('#team1').value.trim(); S.team2 = $('#team2').value.trim(); S.limit = Math.max(1, +$('#limit').value || 15); S.pen = Math.max(0, +$('#pen').value >= 0 && $('#pen').value !== '' ? +$('#pen').value : 15); S.fixnr = $('#fixnr').value.trim(); saveS();
+}));
+$('#segM').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.mset = b.dataset.v; setSeg('#segM', S.mset); saveS(); };
+$('#segR').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.rn = b.dataset.v; setSeg('#segR', S.rn); saveS(); };
+$('#segB').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.bmode = b.dataset.v; setSeg('#segB', S.bmode); saveS(); };
+$('#segN').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.n = +b.dataset.v; setSeg('#segN', String(S.n)); saveS(); };
+soundOn = !!S.sound;
+
+/* =========================================================
+   Spiel
+   ========================================================= */
+let G = null, tick = null, funkMode = 'TMO';
+
+function rufname(mode, nr) { return (S.rn === 'kurz' ? 'Fl.' : DATA.funk[mode].prefix) + ' ' + DATA.ort + ' ' + nr; }
+function fitFc() {
+  $$('#game .tbox').forEach(b => { const n = $('.lknote', b), tg = $('.tgrid', b); if (n && tg) n.style.top = (tg.offsetTop + tg.offsetHeight / 2) + 'px'; });
+  const bar = $('#funkBar .fcbar'), tb = $('#game .tbox'); if (!bar || !tb) return;
+  bar.style.marginLeft = '0'; bar.style.width = 'max-content'; bar.style.maxWidth = 'none';
+  const a = tb.getBoundingClientRect(), b0 = bar.getBoundingClientRect();
+  bar.classList.remove('tight'); bar.style.marginLeft = (a.left - b0.left) + 'px'; bar.style.width = 'max-content'; bar.style.maxWidth = 'none';
+  if (bar.getBoundingClientRect().width > a.width) bar.classList.add('tight');
+}
+function renderFunk() {
+  $('#funkBar').innerHTML = `<span class="trupps elwrow"><span class="pill elw"><span class="mp" data-tip="TMO (Trunked Mode Operation): Netzbetrieb über das Digitalfunknetz">TMO</span>${esc(rufname('TMO', DATA.elw.nummer))}</span><span class="pill elw"><span class="mp dmo" data-tip="DMO (Direct Mode Operation): Direktbetrieb, Funkgerät zu Funkgerät ohne Netz">DMO</span>${esc(rufname('DMO', DATA.elw.nummer))}</span></span>${G && G.tk && G.tk.includes('start') ? '<span class="fcbr"></span><div class="fcbar"><span class="n">1</span><span class="t">Rufgruppe und Funkcheck <i class="tsub">(Zeit startet nach Abschluss)</i></span><button class="btn" id="fcAll">Alle Einheiten erledigt</button></div>' : ''}`;
+  if ($('#fcAll')) $('#fcAll').onclick = startAll;
+  $('#game').classList.toggle('dmo', funkMode === 'DMO');
+  if (G && G.boxes) G.boxes.forEach((b, ti) => paintBox(ti));
+  fitFc();
+}
+
+function paintBox(ti) {
+  const b = G.boxes[ti], m = G.mode[ti], f = DATA.funk[m], st = G.tk[ti];
+  b.classList.toggle('dmo', m === 'DMO'); $('.tp', b).textContent = rufname(m, b.dataset.t);
+  b.classList.toggle('tlock', st === 'start'); $('.tgrid', b).inert = st === 'start';
+  { let n = $('.lknote', b);
+    if (st !== 'start') { if (n) n.remove(); }
+    else {
+      if (!n) { n = document.createElement('div'); n.className = 'lknote'; b.appendChild(n); n.onclick = e => { if (e.target.closest('.lkchk')) { G.fc[ti] = !G.fc[ti]; paintBox(ti); } }; }
+      n.classList.toggle('ok', !!G.fc[ti]);
+      n.innerHTML = `<button class="lkchk" title="Funkcheck dieser Einheit abhaken (freiwillig)">${G.fc[ti] ? '✓' : ''}</button><div>Schritt 1: Rufgruppe und Funkcheck<br>Betriebsart ${m}, Rufgruppe ${esc(f.gruppe)} (Kurzwahl ${f.kurzwahl})<small>${G.fc[ti] ? 'Funkcheck erledigt. Die Module öffnen mit "Alle Einheiten erledigt" oben.' : 'Funkcheck erledigt? Hier abhaken (freiwillig). Die Module öffnen mit "Alle Einheiten erledigt" oben.'}</small></div>`;
+      const tg = $('.tgrid', b); n.style.top = (tg.offsetTop + tg.offsetHeight / 2) + 'px';
+    } }
+  const sb = $('.sb', b); sb.classList.toggle('dmo', m === 'DMO'); sb.classList.toggle('act', st === 'start');
+  $('.sg', sb).title = 'Soll-Rufgruppe'; $('.sg', sb).innerHTML = `<span class="mp ${m === 'DMO' ? 'dmo' : ''}">${m}</span> <b>${esc(f.gruppe)}</b> <i>(Kurzwahl ${f.kurzwahl})</i>`;
+}
+function startAll() {
+  if (!G || G.ended) return;
+  if (!G.t0) G.t0 = Date.now();
+  G.tl.forEach((_, ti) => { if (G.tk[ti] === 'start') { G.tk[ti] = 'run'; paintBox(ti); } });
+  sndStart(); renderFunk();
+}
+function startGame() {
+  audio();
+  const cfg = { team: [S.team1, S.team2].filter(Boolean).join(' & ') || 'Ohne Namen', mode: S.mode, limit: S.limit * 60, pen: S.pen, n: S.n, trupps: DATA.trupps.filter(t => S.trupps.includes(t)), fixnr: S.fixnr, bmode: S.bmode, mset: S.mset };
+  const seq = seqToday() + 1; store.set('funks_seq_' + today(), seq);
+  const nr = today() + '_' + String(seq).padStart(3, '0');
+  const seed = cfg.fixnr || (nr + '_' + Math.random().toString(36).slice(2));
+  const rng = makeRng(seed);
+  const tl = cfg.trupps.length ? cfg.trupps : ['43'];
+  G = { cfg, nr, seed, t0: null, fc: {}, wd: {}, pen: 0, errs: 0, ended: false, mods: [] };
+  const common = rng.shuffle(MODULES.map((_, i) => i)).slice(0, cfg.n);
+  tl.forEach((tn, ti) => rng.shuffle(cfg.mset === 'gleich' ? common : MODULES.map((_, i) => i)).slice(0, cfg.n).forEach(i => G.mods.push({ def: MODULES[i], st: MODULES[i].make(rng, cfg), solved: false, errors: 0, at: null, ti, trupp: tn })));
+  G.tl = tl; G.mode = tl.map((_, ti) => ti % 2 === 0 ? 'TMO' : 'DMO'); G.tk = tl.map(() => 'start');
+  funkMode = 'TMO';
+  $('#gNr').textContent = 'Einsatz-Nr. ' + nr + (cfg.fixnr ? '  (Aufgaben nach ' + cfg.fixnr + ')' : '');
+  $('#gTeam').textContent = cfg.team;
+  $('#clockLbl').textContent = cfg.mode === 'limit' ? 'Restzeit' : 'Zeit';
+  paintSound();
+  const n = cfg.n, T = tl.length;
+  const cols = T === 1 ? (n <= 3 ? n : (n === 4 ? 2 : 3)) : (n <= 2 ? n : 2), rows = Math.ceil(n / cols);
+  const grid = $('#grid'); grid.classList.toggle('many', T > 2); grid.style.setProperty('--cols', T); grid.style.setProperty('--rows', 1);
+  grid.innerHTML = '';
+  G.boxes = tl.map((tn, ti) => {
+    const box = document.createElement('section'); box.className = 'tbox'; box.dataset.t = tn;
+    box.innerHTML = `<div class="th"><span class="tp"></span><span class="tdone">Einheit fertig</span><span class="sp2"></span><div class="hpill"><span>Module</span><b class="tm">0/${n}</b></div><div class="hpill te"><span>Fehler</span><b class="tn">0</b></div></div><div class="sb"><span class="sg"></span></div><div class="tgrid"></div>`;
+    const tg = $('.tgrid', box); tg.style.setProperty('--c', cols); tg.style.setProperty('--r', rows);
+    grid.appendChild(box); return box;
+  });
+  G.activeBuch = null;
+  G.mods.forEach((m, i) => {
+    const card = document.createElement('article'); card.className = 'mod'; card.dataset.mod = m.def.id;
+    card.innerHTML = `<header><h3>${esc(m.def.name)}</h3><span class="eb">Fehler <b>0</b></span></header><div class="body"></div>`;
+    $('.tgrid', G.boxes[m.ti]).appendChild(card); m.card = card;
+    if (m.def.id === 'buchstabieren' && !G.activeBuch) G.activeBuch = card;
+    const api = {
+      err: () => onError(m),
+      done: () => onSolved(m)
+    };
+    m.def.mount($('.body', card), m.st, api);
+  });
+  if (T > 1 && G.activeBuch) G.activeBuch.classList.add('act');
+  grid.onpointerdown = e => { const c = e.target.closest('.mod'); if (c && c.dataset.mod === 'buchstabieren' && c !== G.activeBuch) { if (G.activeBuch) G.activeBuch.classList.remove('act'); G.activeBuch = c; if (T > 1) c.classList.add('act'); } };
+  renderFunk(); updateHud(); show('game'); fitFc(); fitZoom();
+  clearInterval(tick); tick = setInterval(loop, 200); loop();
+}
+
+function total() { return (G.t0 ? (Date.now() - G.t0) / 1000 : 0) + G.pen; }
+function loop() {
+  if (!G || G.ended) return;
+  const t = total(), c = $('#clock');
+  let shown = t; c.classList.remove('warn', 'crit'); c.classList.toggle('wait', !G.t0); $('#clockLbl').textContent = !G.t0 ? 'Startet nach Funkcheck' : G.cfg.mode === 'limit' ? 'Restzeit' : 'Zeit';
+  if (G.cfg.mode === 'limit') { shown = G.cfg.limit - t; if (shown <= 60) c.classList.add('warn'); if (shown <= 30) c.classList.add('crit'); }
+  c.firstChild.nodeValue = fmt(Math.max(0, G.cfg.mode === 'limit' ? Math.ceil(shown) : Math.floor(shown)));
+  if (G.t0 && G.cfg.mode === 'limit') { let hit = 0; [90, 60, 30].forEach(th => { if (G.cfg.limit > th && shown <= th && shown > 0 && !G.wd[th]) { G.wd[th] = 1; hit = th; } }); if (hit) sndWarn(hit); }
+  if (G.cfg.mode === 'limit' && shown <= 0) endGame('Zeit abgelaufen');
+}
+function updateHud() {
+  const s = G.mods.filter(m => m.solved).length;
+  $('#gSolved').textContent = s + '/' + G.mods.length; $('#gErr').textContent = G.errs; $('#gErrP').classList.toggle('has', G.errs > 0);
+  G.boxes.forEach((b, ti) => {
+    const ms = G.mods.filter(m => m.ti === ti), ok = ms.filter(m => m.solved).length, er = ms.reduce((a, m) => a + m.errors, 0);
+    $('.tm', b).textContent = ok + '/' + ms.length; $('.tn', b).textContent = er; $('.te', b).classList.toggle('has', er > 0); b.classList.toggle('done', ok === ms.length);
+  });
+}
+function fitZoom() {
+  if (!G || !G.boxes) return;
+  G.boxes.forEach(b => {
+    const cards = $$('.mod', b), tg = $('.tgrid', b); cards.forEach(c => { c.style.zoom = 1; });
+    const cs = getComputedStyle(tg), c = +cs.getPropertyValue('--c'), r = +cs.getPropertyValue('--r'), gap = 8;
+    const cw = (tg.clientWidth - gap * (c - 1)) / c, ch = (tg.clientHeight - gap * (r - 1)) / r;
+    const cmp = G.boxes.length > 1;
+    cards.forEach(x => x.classList.toggle('cmp', cmp));
+    const z = Math.max(.5, Math.min(1, cw / 330, ch / (cmp ? 266 : 304)));
+    cards.forEach(x => { x.style.zoom = z < .995 ? z : 1; });
+  });
+}
+window.addEventListener('resize', () => { if (G && !G.ended && $('#game').classList.contains('on')) { fitFc(); fitZoom(); } });
+function onError(m) {
+  if (G.ended || m.solved) return;
+  m.errors++; G.errs++; G.pen += G.cfg.pen;
+  $('.eb b', m.card).textContent = m.errors; $('.eb', m.card).classList.add('has');
+  m.card.classList.remove('shake'); void m.card.offsetWidth; m.card.classList.add('shake');
+  const p = $('#penFlash'); p.textContent = '+' + G.cfg.pen + ' s'; p.classList.add('show'); clearTimeout(p._t); p._t = setTimeout(() => p.classList.remove('show'), 1400);
+  sndErr(); updateHud(); loop();
+}
+function onSolved(m) {
+  if (G.ended || m.solved) return;
+  m.solved = true; m.at = total(); m.card.classList.add('solved'); sndOk(); updateHud();
+  if (G.mods.every(x => x.solved)) setTimeout(() => endGame('Lage gesichert'), 700);
+}
+function endGame(reason) {
+  if (!G || G.ended) return; G.ended = true; clearInterval(tick);
+  const t = total();
+  const rec = {
+    nr: G.nr, date: today(), team: G.cfg.team, reason, ok: reason === 'Lage gesichert',
+    mode: G.cfg.mode, limit: G.cfg.limit, pen: G.cfg.pen, fixnr: G.cfg.fixnr, trupps: G.cfg.trupps,
+    time: G.cfg.mode === 'limit' && reason === 'Zeit abgelaufen' ? G.cfg.limit : t, errs: G.errs,
+    mods: G.mods.map(m => ({ t: m.trupp, name: (G.cfg.trupps.length > 1 ? DATA.ort + ' ' + m.trupp + ': ' : '') + m.def.name, solved: m.solved, errors: m.errors, at: m.at }))
+  };
+  const list = store.get('funks_runden_' + today(), []); list.push(rec); store.set('funks_runden_' + today(), list);
+  G.rec = rec; showResult(rec);
+}
+const ICON_X = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+function paintAbort(armed) { const b = $('#gAbort'); b.classList.toggle('arm', !!armed); b.innerHTML = armed ? 'Wirklich abbrechen?' : ICON_X; b.dataset.tip = armed ? 'Noch einmal antippen: Übung wird beendet' : 'Übung abbrechen (zweimal antippen)'; b.setAttribute('aria-label', b.dataset.tip); }
+$('#gAbort').onclick = () => {
+  const b = $('#gAbort');
+  if (b.dataset.arm) { clearTimeout(b._t); delete b.dataset.arm; paintAbort(false); endGame('Übung abgebrochen'); return; }
+  b.dataset.arm = 1; paintAbort(true); b._t = setTimeout(() => { delete b.dataset.arm; paintAbort(false); }, 3000);
+};
+paintAbort(false);
+$('#gSound').onclick = () => { soundOn = !soundOn; S.sound = soundOn ? 1 : 0; saveS(); paintSound(); };
+
+/* Druckliste auf der Startseite */
+const PL = [
+  { k: 'rules', t: 'Einsatzunterlagen', s: 'Je Einheit 1 Exemplar, an die Einheiten', w: 'Einheiten', c: 'var(--amber)', f: () => { buildRules(); return [rulesPdf(), 'Einsatzunterlagen_Funkuebung_ELW.pdf']; } },
+  { k: 'plan', t: 'Ablaufplan', s: 'Für Kommunikatoren ELW und Ausbilder', w: 'ELW', c: '#aab4c0', f: () => [planPdf(), 'Ablaufplan_Funkuebung_ELW.pdf'] }
+];
+const plKey = () => 'funks_druck_' + today();
+function plPaint(init) {
+  const d = store.get(plKey(), {});
+  $('#plList').innerHTML = PL.map(p => `<div class="plrow ${d[p.k] ? 'on' : ''}" data-k="${p.k}"><button class="plchk" title="Als gedruckt markieren">${d[p.k] ? '✓' : ''}</button><div class="pln"><b>${p.t}</b><small>${p.s}</small></div><span class="plw" style="background:${p.c}">${p.w}</span><button class="btn" data-open="${p.k}">PDF</button></div>`).join('');
+  const n = PL.filter(p => d[p.k]).length, all = n === PL.length;
+  $('#plCnt').textContent = ''; $('#plSum').className = 'plsum ' + (all ? 'g' : n ? 'y' : 'r'); $('#plSum').textContent = n + '/' + PL.length + ' gedruckt';
+  $('#plBox').classList.toggle('all', all);
+  if (all !== plWas) { if (all) $('#plBox').open = false; plWas = all; }
+  if (init) { $('#plBox').open = !all; plWas = all; }
+}
+let plWas = false;
+function plOpen(p, btn) {
+  const r = p.f();
+  download(r[0], r[1]);
+  const d = store.get(plKey(), {}); d[p.k] = 1; store.set(plKey(), d);
+  return true;
+}
+$('#plList').onclick = e => {
+  const row = e.target.closest('.plrow'); if (!row) return;
+  const p = PL.find(q => q.k === row.dataset.k);
+  if (e.target.closest('[data-open]')) { const b = e.target.closest('[data-open]'); if (plOpen(p, b)) plPaint(); return; }
+  if (e.target.closest('.plchk')) { const d = store.get(plKey(), {}); if (d[p.k]) delete d[p.k]; else d[p.k] = 1; store.set(plKey(), d); plPaint(); }
+};
+$('#plAll').onclick = () => { PL.forEach(p => plOpen(p)); plPaint(); };
+plPaint(true);
+
+/* ---------- Ergebnis ---------- */
+let lastRec = null;
+function showResult(r) {
+  lastRec = r;
+  $('#rNr').textContent = 'Einsatz-Nr. ' + r.nr;
+  const h = $('#rHead'); h.textContent = r.reason; h.className = 'big2 ' + (r.ok ? 'ok' : 'bad');
+  $('#rTeam').textContent = 'Team: ' + r.team + '   |   Einheiten: ' + r.trupps.map(t => DATA.ort + ' ' + t).join(', ');
+  $('#rTime').textContent = fmt(r.time); $('#rErr').textContent = r.errs;
+  $('#rMods').textContent = r.mods.filter(m => m.solved).length + '/' + r.mods.length;
+  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('');
+  show('result');
+}
+$('#rAgain').onclick = () => { initStart(); tryStart(); };
+$('#rHome').onclick = () => { initStart(); show('start'); };
+$('#rEve').onclick = () => openEvening('result');
+$('#rPdf').onclick = () => download(roundPdf(lastRec), 'Funkuebung_' + lastRec.nr + '.pdf');
+$('#rJpg').onclick = () => jpgRound(lastRec);
+
+/* ---------- Abend ---------- */
+let eveningBack = 'start';
+function openEvening(back) {
+  eveningBack = back; const list = store.get('funks_runden_' + today(), []);
+  $('#eDate').textContent = 'Dienstabend ' + today() + '   |   ' + list.length + ' Runde' + (list.length === 1 ? '' : 'n');
+  $('#eBody').innerHTML = list.map(r => `<tr><td>${r.nr}</td><td>${esc(r.team)}</td><td class="${r.ok ? 'stat-ok' : 'stat-no'}">${esc(r.reason)}</td><td>${fmt(r.time)}</td><td>${r.errs}</td><td>${r.mods.filter(m => m.solved).length}/${r.mods.length}</td><td class="dl"><button class="btn ghost sm" data-i="${list.indexOf(r)}" data-f="pdf">PDF</button> <button class="btn ghost sm" data-i="${list.indexOf(r)}" data-f="jpg">JPG</button></td></tr>`).join('');
+  $('#eEmpty').style.display = list.length ? 'none' : 'block'; $('#ePdf').disabled = !list.length;
+  show('evening');
+}
+$('#eBody').onclick = e => {
+  const b = e.target.closest('button[data-f]'); if (!b) return;
+  const r = store.get('funks_runden_' + today(), [])[+b.dataset.i]; if (!r) return;
+  if (b.dataset.f === 'pdf') download(roundPdf(r), 'Funkuebung_' + r.nr + '.pdf'); else jpgRound(r);
+};
+$('#toEvening').onclick = () => openEvening('start');
+$('#eBack').onclick = () => { initStart(); show(eveningBack); };
+$('#ePdf').onclick = () => download(makePdf(eveningLines(store.get('funks_runden_' + today(), []))), 'Funkuebung_Abend_' + today() + '.pdf');
+$('#eClear').onclick = () => { const b = $('#eClear'); if (b.dataset.arm) { store.set('funks_runden_' + today(), []); store.set('funks_seq_' + today(), 0); delete b.dataset.arm; b.textContent = 'Abend zurücksetzen'; openEvening(eveningBack); initStart(); } else { b.dataset.arm = 1; b.textContent = 'Wirklich zurücksetzen?'; setTimeout(() => { delete b.dataset.arm; b.textContent = 'Abend zurücksetzen'; }, 3000); } };
+
+/* ---------- Download: PDF und JPG ohne Bibliotheken ---------- */
+function eveningLines(list) {
+  const L = [['Funkübung ELW: Abendauswertung', 20, 1], ['Dienstabend ' + today() + ', ' + list.length + ' Runde' + (list.length === 1 ? '' : 'n'), 13, 0], ['', 10, 0]];
+  list.forEach(r => {
+    L.push([r.nr + '   ' + r.team, 12, 1]);
+    L.push(['   ' + r.reason + ', Zeit ' + fmt(r.time) + ', Fehler ' + r.errs + ', Module ' + r.mods.filter(m => m.solved).length + '/' + r.mods.length, 11, 0]);
+    r.mods.forEach(m => L.push(['      ' + m.name + ': ' + (m.solved ? 'gelöst' : 'offen') + ', Fehler ' + m.errors, 10, 0]));
+    L.push(['', 8, 0]);
+  });
+  const ok = list.filter(r => r.ok).length, err = list.reduce((a, r) => a + r.errs, 0);
+  L.push(['Gesamt: ' + ok + ' von ' + list.length + ' Runden gesichert, Fehler insgesamt ' + err, 12, 1]);
+  return L;
+}
+function makePdf(lines) {
+  const l1 = t => String(t).replace(/[^\u0000-ÿ]/g, '?').replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  // Layout mit Schriftfaktor k; so lange verkleinern, bis die Seitenzahl möglichst klein ist
+  const layout = k => {
+    const wrapped = [];
+    lines.forEach(([t, sz, b]) => { const max = Math.floor(95 * 11 / (sz * k)); if (t.length <= max) wrapped.push([t, sz * k, b]); else { let cur = ''; t.split(' ').forEach(w => { if ((cur + ' ' + w).length > max) { wrapped.push([cur, sz * k, b]); cur = w; } else cur = cur ? cur + ' ' + w : w; }); wrapped.push([cur, sz * k, b]); } });
+    const lh = 1.5 - (1 - k) * .5, pages = []; let cur = '', y = 800;
+    wrapped.forEach(([t, sz, b]) => { if (y < 52) { pages.push(cur); cur = ''; y = 800; } if (t) cur += `BT /F${b ? 2 : 1} ${sz.toFixed(2)} Tf 1 0 0 1 50 ${y.toFixed(2)} Tm (${l1(t)}) Tj ET\n`; y -= sz * lh; });
+    pages.push(cur); return pages;
+  };
+  let pages = layout(1);
+  for (let k = .96; pages.length > 1 && k >= .66; k -= .04) { const p = layout(k); if (p.length < pages.length) pages = p; }
+  // Fußzeile: links Datum und Uhrzeit, mittig "Seite X von Y" (X und Y fett)
+  const p2 = n => String(n).padStart(2, '0'), d = new Date(), stamp = p2(d.getDate()) + '.' + p2(d.getMonth() + 1) + '.' + d.getFullYear() + ', ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ' Uhr';
+  const cv = document.createElement('canvas').getContext('2d'), SZ = 9;
+  const tw = (t, b) => { try { cv.font = (b ? 'bold ' : '') + SZ + 'px Helvetica, Arial, sans-serif'; return cv.measureText(t).width; } catch (e) { return t.length * SZ * .52; } };
+  pages = pages.map((c, n) => {
+    const seg = [['Seite ', 0], [String(n + 1), 1], [' von ', 0], [String(pages.length), 1]], tot = seg.reduce((a, [t, b]) => a + tw(t, b), 0);
+    let fx = (595 - tot) / 2, ft = '0.3 0.35 0.4 rg\n';
+    seg.forEach(([t, b]) => { ft += `BT /F${b ? 2 : 1} ${SZ} Tf 1 0 0 1 ${fx.toFixed(2)} 22 Tm (${t}) Tj ET\n`; fx += tw(t, b); });
+    ft += `BT /F1 ${SZ} Tf 1 0 0 1 24 22 Tm (${l1(stamp)}) Tj ET\n`;
+    return c + '0.09 0.125 0.17 rg\n' + ft;
+  });
+  const objs = ['<< /Type /Catalog /Pages 2 0 R >>', null, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>'];
+  const kids = [];
+  pages.forEach(c => { const pi = objs.length + 1; objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents ${pi + 1} 0 R >>`); objs.push(`<< /Length ${c.length} >>\nstream\n${c}endstream`); kids.push(pi + ' 0 R'); });
+  objs[1] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;
+  let out = '%PDF-1.4\n', offs = [];
+  objs.forEach((o, i) => { offs.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const xr = out.length; out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offs.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  const u = new Uint8Array(out.length); for (let i = 0; i < out.length; i++) u[i] = out.charCodeAt(i) & 255;
+  return new Blob([u], { type: 'application/pdf' });
+}
+function download(blob, name) {
+  const u = URL.createObjectURL(blob);
+  if (blob.type === 'application/pdf') { const w = window.open(u, '_blank'); if (w) { setTimeout(() => URL.revokeObjectURL(u), 300000); return; } }
+  const a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(u); a.remove(); }, 1000);
+}
+function roundCanvas(r, bg) {
+  const ort = DATA.ort, multi = r.trupps.length > 1;
+  const grp = r.trupps.map(e => {
+    const mods = r.mods.filter(m => m.t === e || m.name.startsWith(ort + ' ' + e + ': ') || !multi).map(m => Object.assign({}, m, { short: m.name.replace(ort + ' ' + e + ': ', '') }));
+    return { e, mods, err: mods.reduce((a, m) => a + m.errors, 0), ok: mods.filter(m => m.solved).length };
+  });
+  const rowsN = grp.reduce((a, g) => a + g.mods.length, 0), RH = 44, GH = 78;
+  const W = 1200, H = 470 + grp.length * GH + rowsN * RH + 50, c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); const H1 = "600 56px Oswald,'Arial Narrow',Impact,sans-serif", BF = "'Public Sans','Segoe UI',Arial,sans-serif", OS = "600 30px Oswald,'Arial Narrow',Impact,sans-serif";
+  x.fillStyle = bg || '#F5F2EB'; x.fillRect(0, 0, W, H); x.fillStyle = '#B8321F'; x.fillRect(0, 0, W, 16);
+  x.fillStyle = '#17202B'; x.font = OS; x.fillText('FUNKÜBUNG ELW', 50, 74);
+  x.fillStyle = '#4A5563'; x.font = "600 26px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText('Einsatz-Nr. ' + r.nr, 50, 116);
+  x.fillStyle = r.ok ? '#2F7D4B' : '#B8321F'; x.font = "600 38px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText(r.reason.toUpperCase(), 50, 180);
+  x.fillStyle = '#17202B'; x.font = '20px ' + BF; x.fillText('Team: ' + r.team, 50, 236); x.fillText('Einheiten: ' + r.trupps.map(t => ort + ' ' + t).join(', '), 50, 266);
+  [['Gesamtzeit', fmt(r.time)], ['Fehler', String(r.errs)], ['Module gelöst', r.mods.filter(m => m.solved).length + '/' + r.mods.length]].forEach((k, i) => {
+    const bx = 50 + i * 290; x.fillStyle = '#17202B'; x.fillRect(bx, 300, 262, 120); x.fillStyle = '#F0B03C'; x.font = "600 60px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText(k[1], bx + 24, 372);
+    x.fillStyle = '#C9D1DA'; x.font = '16px ' + BF; x.fillText(k[0].toUpperCase(), bx + 24, 402);
+  });
+  let y = 470;
+  grp.forEach(g => {
+    x.fillStyle = '#17202B'; x.fillRect(50, y, W - 100, 56);
+    x.fillStyle = '#F0B03C'; x.font = OS; x.fillText(DATA.funk.TMO.prefix + ' ' + ort + ' ' + g.e, 70, y + 38);
+    x.fillStyle = '#C9D1DA'; x.font = '600 20px ' + BF; x.textAlign = 'right';
+    x.fillText('Module ' + g.ok + '/' + g.mods.length + '     Fehler ' + g.err, W - 70, y + 36); x.textAlign = 'left';
+    y += GH - 8;
+    const row = (name, status, good, extra) => {
+      y += RH - 12;
+      x.fillStyle = '#17202B'; x.font = "600 22px " + BF; x.fillText(name, 70, y);
+      x.fillStyle = good ? '#2F7D4B' : '#B8321F'; x.fillText(status, 580, y);
+      x.fillStyle = '#4A5563'; x.font = '20px ' + BF; x.fillText(extra, 920, y);
+      x.fillStyle = '#C9D1DA'; x.fillRect(50, y + 14, W - 100, 1); y += 12;
+    };
+    g.mods.forEach(m => row(m.short, m.solved ? 'gelöst nach ' + fmt(m.at) : 'offen', m.solved, 'Fehler ' + m.errors));
+    y += 8;
+  });
+  return c;
+}
+function jpgRound(r) { roundCanvas(r).toBlob(b => download(b, 'Funkuebung_' + r.nr + '.jpg'), 'image/jpeg', .92); }
+/* PDF mit demselben Layout wie die JPG-Auswertung (A4, ein Bild pro Runde) */
+function roundPdf(r) {
+  const c = roundCanvas(r, '#FFFFFF'), jpg = atob(c.toDataURL('image/jpeg', .95).split(',')[1]);
+  const PW = 595, PH = 842, M = 24, FOOT = 40, top = 8;
+  const sc = Math.min((PW - 2 * M) / c.width, (PH - M - FOOT - top) / c.height), w = c.width * sc, h = c.height * sc, x0 = (PW - w) / 2, y0 = PH - top - h;
+  const cs = `q ${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x0.toFixed(2)} ${y0.toFixed(2)} cm /Im0 Do Q`;
+  // Fußzeile: mittig "Seite X von Y" (X und Y fett), links unten Datum und Uhrzeit der Erstellung
+  const p2 = n => String(n).padStart(2, '0'), d = new Date();
+  const stamp = p2(d.getDate()) + '.' + p2(d.getMonth() + 1) + '.' + d.getFullYear() + ', ' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ' Uhr';
+  const cv = document.createElement('canvas').getContext('2d'), SZ = 9;
+  const tw = (t, b) => { try { cv.font = (b ? 'bold ' : '') + SZ + 'px Helvetica, Arial, sans-serif'; return cv.measureText(t).width; } catch (e) { return t.length * SZ * .52; } };
+  const seg = [['Seite ', 0], ['1', 1], [' von ', 0], ['1', 1]], tot = seg.reduce((a, [t, b]) => a + tw(t, b), 0);
+  let fx = (PW - tot) / 2, ft = '0.3 0.35 0.4 rg\n';
+  seg.forEach(([t, b]) => { ft += `BT /F${b ? 2 : 1} ${SZ} Tf 1 0 0 1 ${fx.toFixed(2)} 22 Tm (${t}) Tj ET\n`; fx += tw(t, b); });
+  const l1 = t => t.replace(/[^\u0000-ÿ]/g, '?').replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  ft += `BT /F1 ${SZ} Tf 1 0 0 1 ${M} 22 Tm (${l1(stamp)}) Tj ET\n`;
+  const content = cs + '\n' + ft;
+  const objs = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im0 7 0 R >> /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>`,
+    `<< /Length ${content.length} >>\nstream\n${content}\nendstream`,
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>', 'IMG'];
+  const parts = []; let len = 0; const offs = []; const add = t => { parts.push(t); len += t.length; };
+  add('%PDF-1.4\n');
+  objs.forEach((o, i) => {
+    offs.push(len);
+    if (o === 'IMG') { add(`${i + 1} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${c.width} /Height ${c.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpg.length} >>\nstream\n`); add(jpg); add('\nendstream\nendobj\n'); }
+    else add(`${i + 1} 0 obj\n${o}\nendobj\n`);
+  });
+  const xr = len; add(`xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offs.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`);
+  const all = parts.join(''), u = new Uint8Array(all.length); for (let k = 0; k < all.length; k++) u[k] = all.charCodeAt(k) & 255;
+  return new Blob([u], { type: 'application/pdf' });
+}
+
+/* =========================================================
+   Einsatzunterlagen (Druckansicht aus denselben Daten)
+   ========================================================= */
+function buildRules() {
+  const bt = Object.entries(DATA.buchstabiertafel).map(([k, v]) => `<tr><td class="ctr"><b>${k}</b></td><td>${v}</td></tr>`);
+  const half = Math.ceil(bt.length / 2);
+  const z = DATA.ziffern.map((w, i) => `<tr><td class="ctr"><b>${i}</b></td><td data-col="${[2, 3, 4, 5, 7, 9].includes(i) ? 'Hinweis' : ''}">${[2, 3, 4, 5, 7, 9].includes(i) ? `<b data-col="Hinweis">${w}</b>` : w}</td></tr>`).join('');
+  let h = `<h1>Einsatzunterlagen Funkübung ELW</h1><p>Diese Einsatzunterlagen gehören den Einheiten. Die genaue Aufgabenstellung steht nur hier, die Kommunikatoren ELW kennen sie nicht und sehen nur ihren Bildschirm. Gelöst wird allein über Funk, gesprochen wird nach den Funkregeln der Lehrstoffblätter "Ausbildung zum Sprechfunker" (Landesfeuerwehrschule Baden-Württemberg, 15. Auflage 2024). Das FMS (Funkmeldesystem) ist ausgefallen, Statusmeldungen werden als Funkgespräch im Klartext durchgegeben.</p>
+  <h2>Ablauf der Übung</h2>
+  <table><tr><th>Funkstelle</th><th>im TMO</th><th>im DMO</th></tr><tr><td><b>ELW</b></td><td>${DATA.funk.TMO.prefix} ${DATA.ort} ${DATA.elw.nummer}</td><td>${DATA.funk.DMO.prefix} ${DATA.ort} ${DATA.elw.nummer}</td></tr><tr><td><b>Einheit</b> <i>(Beispiel)</i></td><td>${DATA.funk.TMO.prefix} ${DATA.ort} 43</td><td>${DATA.funk.DMO.prefix} ${DATA.ort} 43</td></tr><tr><td><b>Rufgruppe</b></td><td>${DATA.funk.TMO.gruppe} (Kurzwahl ${DATA.funk.TMO.kurzwahl})</td><td>${DATA.funk.DMO.gruppe} (Kurzwahl ${DATA.funk.DMO.kurzwahl})</td></tr></table>
+  <p><b>Schritt 1, Rufgruppe und Funkcheck:</b> Die Kommunikatoren ELW geben jeder Einheit vor, in welcher Betriebsart und Rufgruppe sie sich anmeldet. Danach folgt der Funkcheck. Erst wenn alle Einheiten fertig sind, geben die Kommunikatoren ELW die Aufgaben frei.</p>
+  <p><b>Aufgaben der Module:</b> Die Einheiten lösen sie per Funk mit den Kommunikatoren ELW. Die Angaben dazu stehen weiter unten.</p>
+  <section><h2>Buchstabiertafel und Ziffern</h2><div class="cols"><table><tr><th class="ctr">Buchstabe</th><th>Wort</th></tr>${bt.slice(0, half).join('')}</table><table><tr><th class="ctr">Buchstabe</th><th>Wort</th></tr>${bt.slice(half).join('')}</table><table><tr><th class="ctr">Ziffer</th><th>Sprechweise</th></tr>${z}</table><p class="znote">Blau und fett: besonders aussprechen. Zahlen einzeln sprechen, zum Beispiel 280 als zwoh acht null.</p></div></section>`;
+  MODULES.forEach((m, i) => { h += `<section><h2>${i + 1}. ${m.name}</h2>${m.rules()}</section>`; });
+  $('#rlBody').innerHTML = h;
+}
+
+/* Ablaufplan als Bild-PDF (A4, Zeitleiste mit Schritten, eine Seite) */
+function planPdf() {
+  const W = 595, H = 842;
+  const cv = document.createElement('canvas').getContext('2d');
+  const tw = (t, sz, b) => { try { cv.font = (b ? 'bold ' : '') + sz + 'px Helvetica, Arial, sans-serif'; return cv.measureText(t).width; } catch (e) { return t.length * sz * .52; } };
+  const esc1 = t => String(t).replace(/[^\u0000-ÿ]/g, '?').replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  const f = n => n.toFixed(2);
+  const hx = h => [1, 3, 5].map(i => (parseInt(h.substr(i, 2), 16) / 255).toFixed(3)).join(' ');
+  const RED = hx('#b8321f'), TEAL = hx('#1f7a8c'), GRN = hx('#3f9a66'), GREY = '0.36 0.4 0.45', TXT = '0.1 0.14 0.19';
+  const LANES = [['Kommunikatoren ELW', hx('#5c6675'), '0.955 0.957 0.965'], ['Einheiten', hx('#e9a21f'), '0.992 0.975 0.945'], ['Ausbilder', hx('#3f7fd0'), '0.945 0.962 0.987']];
+  const PH = [
+    ['Vorbereitung', TEAL, [
+      [0, 'App öffnen', 'Namen, Module wählen'],
+      [0, 'Einstellungen prüfen', 'Einheiten, Zeit, Strafzeit'],
+      [2, 'Unterlagen drucken', 'Je Einheit 1 Exemplar'],
+      [1, 'Bereit machen', 'Funkgerät und Unterlagen']]],
+    ['Durchführung', RED, [
+      [0, 'Übung starten', 'Module gesperrt, Uhr steht'],
+      [0, 'Rufgruppe und Funkcheck', 'Schritt 1 in der App, Betriebsart vorgeben'],
+      [0, 'Alle Einheiten erledigt', 'Uhr startet, Module frei'],
+      [9, 'Module lösen per Funk', 'ELW nennt Angaben, Einheit antwortet, ELW gibt Ergebnis ein'],
+      [0, 'Übung beenden', 'Alle gelöst oder Zeitlimit']]],
+    ['Nachbereitung', TEAL, [
+      [9, 'Ergebnis besprechen', 'Zeit, Fehler, Module'],
+      [0, 'Abendauswertung', 'Als PDF öffnen']]]
+  ];
+  const LX = 60, GAP = 6, WS = [176, 176, 130], XS = [LX, LX + 182, LX + 364], FULL = WS[0] + WS[1] + WS[2] + 2 * GAP, BH = 37, ST = 48;
+  const c = [], Y = y => H - y;
+  const text = (t, x, y, sz, b, col, al) => { const w = tw(t, sz, b); const xx = al === 'm' ? x - w / 2 : x; c.push(`${col || TXT} rg BT /F${b ? 2 : 1} ${f(sz)} Tf 1 0 0 1 ${f(xx)} ${f(Y(y))} Tm (${esc1(t)}) Tj ET`); };
+  const fit = (t, sz, b, mw) => { while (tw(t, sz, b) > mw && sz > 5.5) sz -= .2; return sz; };
+  const rr = (x, y, w, h, r, fill, stroke) => {
+    const k = .5523 * r, x0 = x, x1 = x + w, y0 = Y(y + h), y1 = Y(y);
+    c.push(`${fill ? fill + ' rg ' : ''}${stroke ? stroke + ' RG 0.6 w ' : ''}${f(x0 + r)} ${f(y0)} m ${f(x1 - r)} ${f(y0)} l ${f(x1 - r + k)} ${f(y0)} ${f(x1)} ${f(y0 + r - k)} ${f(x1)} ${f(y0 + r)} c ${f(x1)} ${f(y1 - r)} l ${f(x1)} ${f(y1 - r + k)} ${f(x1 - r + k)} ${f(y1)} ${f(x1 - r)} ${f(y1)} c ${f(x0 + r)} ${f(y1)} l ${f(x0 + r - k)} ${f(y1)} ${f(x0)} ${f(y1 - r + k)} ${f(x0)} ${f(y1 - r)} c ${f(x0)} ${f(y0 + r)} l ${f(x0)} ${f(y0 + r - k)} ${f(x0 + r - k)} ${f(y0)} ${f(x0 + r)} ${f(y0)} c ${fill && stroke ? 'B' : fill ? 'f' : 'S'}`);
+  };
+  const circle = (cx, cy, r, fill) => { const q = r * .5523, X = cx, Yy = Y(cy); c.push(`${fill} rg ${f(X + r)} ${f(Yy)} m ${f(X + r)} ${f(Yy + q)} ${f(X + q)} ${f(Yy + r)} ${f(X)} ${f(Yy + r)} c ${f(X - q)} ${f(Yy + r)} ${f(X - r)} ${f(Yy + q)} ${f(X - r)} ${f(Yy)} c ${f(X - r)} ${f(Yy - q)} ${f(X - q)} ${f(Yy - r)} ${f(X)} ${f(Yy - r)} c ${f(X + q)} ${f(Yy - r)} ${f(X + r)} ${f(Yy - q)} ${f(X + r)} ${f(Yy)} c f`); };
+  const arrow = (px, py, tx, ty) => {
+    const my = (py + ty) / 2, e = ty - 6;
+    c.push(`0.6 0.64 0.68 RG 1.2 w ${f(px)} ${f(Y(py))} m ${f(px)} ${f(Y(my))} l ${f(tx)} ${f(Y(my))} l ${f(tx)} ${f(Y(e))} l S`);
+    c.push(`0.6 0.64 0.68 rg ${f(tx)} ${f(Y(ty - 1))} m ${f(tx - 3.6)} ${f(Y(ty - 7.5))} l ${f(tx + 3.6)} ${f(Y(ty - 7.5))} l f`);
+  };
+  // Kopf
+  c.push(`${RED} rg 0 ${f(H - 12)} 595 12 re f`);
+  text('Ablaufplan Funkübung ELW', 30, 46, 22, true, RED);
+  text('Wer macht wann was: Kommunikatoren ELW, Einheiten und Ausbilder', 30, 60, 8.5, false, GREY);
+  // Bahnen: Hintergrund wird nach der Höhenberechnung gezeichnet, deshalb Platzhalter-Index
+  const bgIdx = c.length;
+  LANES.forEach(([nm, col], i) => { rr(XS[i], 72, WS[i], 26, 13, col); text(nm, XS[i] + WS[i] / 2, 89, 10.5, true, '1 1 1', 'm'); });
+  let y = 112, n = 1, prev = null; const rails = [], bodyTop = 104, steps = [], divs = [];
+  PH.forEach(([ph, pc, rows]) => {
+    const y0 = y;
+    rows.forEach(([lane, t, s]) => {
+      const span = lane === 9, x = span ? LX : XS[lane], w = span ? FULL : WS[lane], col = span ? GRN : LANES[lane][1];
+      const mid = span ? XS[1] + WS[1] / 2 : x + w / 2;
+      if (prev) arrow(prev, y - ST + BH, mid, y);
+      rr(x + 1, y + 1.4, w, BH, 7, '0.84 0.85 0.87');
+      rr(x, y, w, BH, 7, '1 1 1', '0.88 0.89 0.91');
+      rr(x, y, 5, BH, 2.5, col);
+      circle(x + 17, y + BH / 2, 8.5, pc); text(String(n), x + 17, y + BH / 2 + 3.4, 9.5, true, '1 1 1', 'm');
+      const mw = w - 40;
+      text(t, x + 31, y + 15, fit(t, 9.3, true, mw), true, '0.11 0.14 0.19');
+      text(s, x + 31, y + 26, fit(s, 7.6, false, mw), false, '0.36 0.4 0.45');
+      prev = mid; y += ST; n++;
+    });
+    rails.push([ph, pc, y0 - 6, y - ST + BH + 6]);
+    divs.push((y - ST + BH + y + 12) / 2);
+    y += 12;
+  });
+  const bottom = y - 12 - ST + BH + 6 + 4;
+  // Bahnen-Hintergrund einfügen
+  const bg = []; LANES.forEach(([nm, col, bgc], i) => { const sv = c.length; rr(XS[i] - 3, bodyTop, WS[i] + 6, bottom - bodyTop, 10, bgc); bg.push(c.splice(sv).join('\n')); });
+  divs.slice(0, -1).forEach(dy => bg.push(`0.74 0.77 0.8 RG 0.8 w ${f(LX - 3)} ${f(Y(dy))} m ${f(XS[2] + WS[2] + 3)} ${f(Y(dy))} l S`));
+  c.splice(bgIdx, 0, ...bg);
+  // Leisten links (Text 90 Grad gedreht)
+  rails.forEach(([ph, pc, a, b]) => {
+    rr(30, a, 24, b - a, 12, pc);
+    const lab = ph.toUpperCase(), sz = Math.min(10.5, (b - a - 18) / tw(lab, 1, true)), w = tw(lab, sz, true);
+    c.push(`1 1 1 rg BT /F2 ${f(sz)} Tf 0 1 -1 0 ${f(42 + sz * .35)} ${f(Y((a + b) / 2) - w / 2)} Tm (${esc1(lab)}) Tj ET`);
+  });
+  // Legende und Fußzeile
+  const ly = bottom + 16;
+  rr(LX, ly - 9, 12, 12, 3, GRN); text('Gemeinsamer Schritt per Funk', LX + 18, ly, 8.5, false, GREY);
+  circle(LX + 256, ly - 3, 6, TEAL); text('Vor- und Nachbereitung durch den Übungsleiter', LX + 268, ly, 8.5, false, GREY);
+  c.push(`${GREY} rg BT /F1 8 Tf 1 0 0 1 42 24 Tm (${esc1('Ablaufplan Funkübung ELW (Übungsmaterial)')}) Tj ET`, `${GREY} rg BT /F1 8 Tf 1 0 0 1 ${W - 42 - 54} 24 Tm (Seite 1 von 1) Tj ET`);
+  window.__planBottom = ly;
+  const body = c.join('\n') + '\n';
+  const objs = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [5 0 R] /Count 1 >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>', `<< /Length ${body.length} >>\nstream\n${body}endstream`];
+  let out = '%PDF-1.4\n', offs = [];
+  objs.forEach((o, i) => { offs.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const xr = out.length; out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offs.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  const u = new Uint8Array(out.length); for (let i = 0; i < out.length; i++) u[i] = out.charCodeAt(i) & 255;
+  return new Blob([u], { type: 'application/pdf' });
+}
+/* Einsatzunterlagen als echte PDF (A4, Text und Tabellen aus dem Inhalt der Einsatzunterlagen) */
+function rulesPdf(root, footer, maxPages) {
+  root = root || $('#rlBody'); footer = footer || 'Einsatzunterlagen Funkübung ELW (Übungsmaterial, fiktive Daten)'; maxPages = maxPages || 2;
+  const W = 595, H = 842, M = 42, CW = W - 2 * M, BOT = 46;
+  const cv = document.createElement('canvas').getContext('2d');
+  const tw = (t, sz, b) => { try { cv.font = (b ? 'bold ' : '') + sz + 'px Helvetica, Arial, sans-serif'; return cv.measureText(t).width; } catch (e) { return t.length * sz * .52; } };
+  const esc1 = t => String(t).replace(/[^\u0000-ÿ]/g, '?').replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  const f = n => n.toFixed(2);
+  const RED = '0.72 0.196 0.122', HEAD = '0.906 0.89 0.855', LINE = '0.6 0.65 0.69';
+  const TCOL = { 'Rot': '0.78 0.1 0.1', 'Blau': '0.12 0.4 0.82', 'Gelb': '0.86 0.58 0.0', 'Grün': '0.12 0.55 0.25', 'Weiß': '0.5 0.55 0.6', 'Hinweis': '0.1 0.36 0.66' };
+  const tableData = tb => Object.assign([...tb.rows].map(r => [...r.cells].map(c => ({ t: c.textContent.trim(), b: c.tagName === 'TH' || !!c.querySelector('b'), h: c.tagName === 'TH', c: c.classList.contains('ctr'), lab: c.classList.contains('lab'), it: (c.querySelector('i') || {}).textContent || '', col: c.dataset.col || '' }))), { w: tb.dataset.w ? tb.dataset.w.split(',').map(Number) : null });
+  const layout = k => {
+    const pages = []; let cur = null, y = 0, split = false;
+    const newPage = () => { cur = []; pages.push(cur); y = H - M + 4; };
+    const text = (t, x, yy, sz, b, col, ws) => { if (t === '') return; cur.push(`${col || '0.09 0.125 0.17'} rg BT /F${b === 3 ? 3 : b ? 2 : 1} ${f(sz)} Tf ${ws ? f(ws) + ' Tw ' : ''}1 0 0 1 ${f(x)} ${f(yy)} Tm (${esc1(t)}) Tj ET`); };
+    const rect = (x, yy, w, h, fill, stroke) => { if (fill) cur.push(`${fill} rg ${f(x)} ${f(yy)} ${f(w)} ${f(h)} re f`); if (stroke) cur.push(`${stroke} RG 0.6 w ${f(x)} ${f(yy)} ${f(w)} ${f(h)} re S`); };
+    const wrap = (t, sz, b, w) => { const out = []; let line = ''; t.replace(/\s+/g, ' ').trim().split(' ').forEach(wd => { const c = line ? line + ' ' + wd : wd; if (line && tw(c, sz, b) > w) { out.push(line); line = wd; } else line = c; }); if (line) out.push(line); return out; };
+    const richPara = (lead, rest, sz, gap, col) => {
+      const sp = tw(' ', sz, false), lh = sz * 1.38;
+      const toks = lead.split(/\s+/).filter(Boolean).map(t => ({ t, b: 1 })).concat(rest.split(/\s+/).filter(Boolean).map(t => ({ t, b: 0 })));
+      const lines = []; let ln = [], lw = 0;
+      toks.forEach(o => { const w = tw(o.t, sz, o.b); if (ln.length && lw + sp + w > CW) { lines.push(ln); ln = []; lw = 0; } lw += (ln.length ? sp : 0) + w; ln.push(o); });
+      if (ln.length) lines.push(ln);
+      lines.forEach((l, li) => { need(lh); y -= lh; let x = M; const lw = l.reduce((q, o) => q + tw(o.t, sz, o.b), 0), ex = li < lines.length - 1 && l.length > 1 ? (CW - lw) / (l.length - 1) : sp; l.forEach(o => { text(o.t, x, y + sz * .28, sz, !!o.b, col); x += tw(o.t, sz, o.b) + ex; }); });
+      y -= gap;
+    };
+    const need = h => { if (y - h < BOT) newPage(); };
+    const jus = (l, sz, w, last) => { const n = l.split(' ').length - 1; const e = (w - tw(l, sz, false)) / n; return last || n < 1 || e > tw(' ', sz, false) * 2.2 ? 0 : Math.max(0, e); };
+    const para = (t, sz, gap, col) => { const ls = wrap(t, sz, false, CW), lh = sz * 1.38; ls.forEach((l, li) => { need(lh); y -= lh; text(l, M, y + sz * .28, sz, false, col, jus(l, sz, CW, li === ls.length - 1)); }); y -= gap; };
+    const tableSize = (rows, w, many) => {
+      const n = Math.max(...rows.map(r => r.length)), sz = (n > 10 ? 9 : 9.5) * k, pad = (n > 10 ? 3 : 5) * k;
+      let cw = Array(n).fill(0);
+      rows.forEach(r => r.forEach((c, i) => { cw[i] = Math.max(cw[i], tw(c.t, sz, c.b) + 2 * pad); }));
+      const tot = cw.reduce((a, b) => a + b, 0);
+      if (tot > w || many) cw = cw.map(c => c * w / tot);
+      if (rows.every(r => r.every(c => c.c))) cw = rows[0][0].lab ? cw.map((_, i) => i ? (w - 46) / (n - 1) : 46) : cw.map(() => w / n);
+      else if (n === 2 && rows.every(r => r[0].c)) cw = [cw[0], w - cw[0]];
+      if (rows.w) { const fix = rows.w.reduce((q, v) => q + v, 0); cw = rows.w.map(v => v || w - fix); }
+      return { cw, sz, pad, rh: sz + 6.5 * k };
+    };
+    const drawTable = (rows, x, w, many) => {
+      const { cw, sz, pad, rh } = tableSize(rows, w, many);
+      rows.forEach((r, ri) => {
+        const ls = rows.w ? r.map((c, i) => wrap(c.t, sz, c.b, cw[i] - 2 * pad)) : null;
+        const rowH = ls ? Math.max(...ls.map(a => a.length)) * sz * 1.22 + 7 * k : rh;
+        if (ri > 0 && y - rowH < BOT && !many) split = true;
+        need(rowH); y -= rowH; let cx = x;
+        r.forEach((c, i) => {
+          rect(cx, y, cw[i], rowH, c.h ? HEAD : null, LINE);
+          if (ls) ls[i].forEach((l, li) => text(l, c.c ? cx + (cw[i] - tw(l, sz, c.b)) / 2 : cx + pad, y + rowH - 3.5 * k - sz * 0.95 - li * sz * 1.22, sz, c.b, TCOL[c.col]));
+          else if (c.it) { const pre = c.t.replace(c.it, '').trim(); text(pre, cx + pad, y + (rh - sz) / 2 + sz * .18, sz, c.b); text(c.it, cx + pad + tw(pre + ' ', sz, c.b), y + (rh - sz) / 2 + sz * .18, sz, 3); }
+          else { const mw = cw[i] - 2 * pad; let tx = c.t; while (tx.length > 1 && tw(tx, sz, c.b) > mw + 0.05) tx = tx.slice(0, -1); text(tx, c.c ? cx + (cw[i] - tw(tx, sz, c.b)) / 2 : cx + pad, y + (rh - sz) / 2 + sz * .18, sz, c.b, TCOL[c.col]); }
+          cx += cw[i];
+        });
+      });
+      y -= 7 * k;
+    };
+    newPage();
+    rect(0, H - 12, W, 12, RED);
+    let skipP = false;
+    const walk = el => {
+      [...el.children].forEach(c => {
+        const tag = c.tagName;
+        if (tag === 'H1') { y -= 18 * k; need(30); text(c.textContent, M, y, 21 * k, true, RED); y -= 8 * k; cur.push(`${LINE} RG 1 w ${M} ${f(y)} m ${W - M} ${f(y)} l S`); y -= 10 * k; }
+        else if (tag === 'H2') { skipP = /^Funkrufnamen/.test(c.textContent); if (skipP) return; need(90 * k); y -= 5 * k; cur.push(`${RED} RG 1.6 w ${M} ${f(y)} m ${W - M} ${f(y)} l S`); y -= 16 * k; text(c.textContent, M, y, 12.5 * k, true); y -= 6 * k; }
+        else if (tag === 'P') { if (skipP) { skipP = false; return; } const lb = c.firstElementChild && c.firstElementChild.tagName === 'B' && c.firstChild === c.firstElementChild ? c.firstElementChild : null; if (lb) richPara(lb.textContent, c.textContent.slice(lb.textContent.length), 9.5 * k, 5 * k, TCOL[c.dataset.col]); else para(c.textContent, 9.5 * k, 5 * k, TCOL[c.dataset.col]); }
+        else if (tag === 'TABLE') { const rows = tableData(c); need(Math.min(rows.length, 4) * tableSize(rows, CW, true).rh); drawTable(rows, M, CW, rows[0].length >= 10); }
+        else if (c.classList.contains('cols')) {
+          let tbs = [...c.querySelectorAll('table')].map(tableData);
+          if (tbs.length === 3) { const hd = tbs[0][0], all = tbs[0].slice(1).concat(tbs[1].slice(1)), n = Math.ceil(all.length / 3); tbs = [0, 1, 2].map(i => [hd].concat(all.slice(i * n, (i + 1) * n))).concat([tbs[2]]); }
+          const gap = 10, w = (CW - gap * (tbs.length - 1)) / tbs.length;
+          const hmax = Math.max(...tbs.map(r => r.length * tableSize(r, w, false).rh));
+          need(hmax + 8); const y0 = y; let ymin = y;
+          tbs.forEach((rows, i) => {
+            y = y0; drawTable(rows, M + i * (w + gap), w, true);
+            const zn = i === tbs.length - 1 ? c.querySelector('.znote') : null;
+            if (zn) { const zs = 8.2 * k, zl = wrap(zn.textContent, zs, false, w); y -= 2 * k; zl.forEach((l, li) => { y -= zs * 1.3; text(l, M + i * (w + gap), y + zs * .28, zs, false, TCOL.Hinweis, jus(l, zs, w, li === zl.length - 1)); }); y -= 2 * k; }
+            ymin = Math.min(ymin, y);
+          });
+          y = ymin;
+        }
+        else walk(c);
+      });
+    };
+    walk(root);
+    pages.forEach((pg, i) => { cur = pg; text(footer, M, 24, 8, false, '0.4 0.45 0.5'); text('Seite ' + (i + 1) + ' von ' + pages.length, W - M - 54, 24, 8, false, '0.4 0.45 0.5'); });
+    pages.split = split; return pages;
+  };
+  let pages = layout(1);
+  for (let k = .96; (pages.length > maxPages || pages.split) && k >= .7; k -= .04) pages = layout(k);
+  const objs = ['<< /Type /Catalog /Pages 2 0 R >>', null, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>'];
+  const kids = [];
+  pages.forEach(p => { const c = p.join('\n') + '\n', pi = objs.length + 1; objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents ${pi + 1} 0 R >>`); objs.push(`<< /Length ${c.length} >>\nstream\n${c}endstream`); kids.push(pi + ' 0 R'); });
+  objs[1] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`;
+  let out = '%PDF-1.4\n', offs = [];
+  objs.forEach((o, i) => { offs.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const xr = out.length; out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offs.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  const u = new Uint8Array(out.length); for (let i = 0; i < out.length; i++) u[i] = out.charCodeAt(i) & 255;
+  return new Blob([u], { type: 'application/pdf' });
+}
+$('#rlBack').onclick = () => { show('start'); };
+$('#rlPrint').onclick = () => { buildRules(); download(rulesPdf(), 'Einsatzunterlagen_Funkuebung_ELW.pdf'); };
+window.addEventListener('afterprint', () => document.body.classList.remove('printrules'));
+
+function tryStart() {
+  $('#team1').value = $('#team1').value.trim(); $('#team2').value = $('#team2').value.trim(); S.team1 = $('#team1').value; S.team2 = $('#team2').value; saveS();
+  if (!S.team1) {
+    const i = $('#team1'); i.classList.add('req'); i.placeholder = 'Bitte Namen eintragen (Pflichtfeld)'; i.focus();
+    i.scrollIntoView({ block: 'center', behavior: 'smooth' }); return;
+  }
+  startGame();
+}
+['team1', 'team2', 'fixnr'].forEach(id => $('#' + id).addEventListener('blur', () => { const el = $('#' + id); el.value = el.value.trim(); }));
+$('#team1').addEventListener('input', () => { $('#team1').classList.remove('req'); $('#team1').placeholder = 'Name Kommunikator 1 *'; });
+$('#go').onclick = tryStart;
+initStart();
+</script>
+</body>
+</html>

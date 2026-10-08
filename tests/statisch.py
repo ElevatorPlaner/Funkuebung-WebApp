@@ -1,7 +1,7 @@
 import re, os, subprocess
 from common import ROOT
 bad = []
-for f in ('funkuebung.html', 'fragen.html'):
+for f in ('funkuebung.html', 'fragen.html', 'standalone.html'):
     s = open(os.path.join(ROOT, f), encoding='utf-8').read()
     for ch, name in (('—', 'Geviertstrich'), ('–', 'Halbgeviertstrich')):
         if ch in s: bad.append(f'{f}: {name} x{s.count(ch)}')

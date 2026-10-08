@@ -1,8 +1,13 @@
 # Funkübung ELW (Feuerwehr Aidlingen)
 
 - `funkuebung.html`: die App für den ELW-PC (eine Datei, offline lauffähig, wird nicht veröffentlicht)
+- `standalone.html`: abgeleitete Fassung ohne Technikfragen per QR-Code und Handy und ohne Ausbilder-App (eigener Speicherschlüssel `funks_settings`). Wird parallel zur App weiterentwickelt, `funkuebung.html` bleibt das Hauptprojekt.
 - `fragen.html`: Handy-Seite für die Technikfragen, wird per GitHub Pages unter https ausgeliefert
 - Der Fragenpool (`fragen:` im `DATA`-Block) muss in beiden Dateien identisch sein.
+
+## Regel für Änderungen
+
+Jede Änderung an Spiellogik, Modulen, Layout, PDFs oder Texten wird in `funkuebung.html` gemacht und dann in `standalone.html` nachgezogen. Ausnahme: alles rund um Technikfragen (`tq*`, QR-Codes, Kanal, Handy-Seite) gibt es nur in der Hauptversion.
 
 ## Handy-Seite veröffentlichen
 
@@ -20,4 +25,5 @@ Voraussetzung: Python mit Playwright (`pip install playwright`) und Chromium, au
     python3 chk.py        # Fragenpool in App und Handy-Seite identisch
     python3 qf.py         # Fragenwahl: pro Einheit 6 verschiedene Fragen
     python3 full.py       # kompletter Ablauf mit 1, 2 und 4 Einheiten
+    python3 smoke_standalone.py  # Grundablauf der Standalone-Variante
     python3 pdfall.py     # PDFs werden erzeugt, ohne Gedankenstriche
