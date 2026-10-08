@@ -30,6 +30,14 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .hpill b{font-size:.64rem;font-weight:700;letter-spacing:.06em;line-height:1}
 .hpill.has{border-color:var(--red2);background:rgba(217,68,47,.16)} .hpill.has b{color:var(--red2)}
 .hpill.tf b{color:var(--green)}
+.hpill.md{min-width:130px} .hpill.lg{min-width:210px}
+.fold{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#121a23;color:var(--muted);font-size:.9rem;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.th.fh{cursor:pointer}
+.chk{display:flex;align-items:center;gap:10px;margin-top:10px;padding:8px 12px;border-radius:8px;border:2px solid var(--amber);background:rgba(240,176,60,.12);width:100%;text-align:left;min-height:44px}
+.chk i{flex:none;width:26px;height:26px;border-radius:6px;border:2px solid var(--amber);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;color:#10200f}
+.chk.on{border-color:var(--green);background:rgba(79,163,106,.14)}
+.chk.on i{background:var(--green);border-color:var(--green)}
+.q.besp{opacity:.78}
 .bar2{background:#121a23;border-top:1px solid var(--line);padding:8px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .tabs{display:flex;gap:8px}
 .tab{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:6px 18px;font-family:var(--h);font-size:1.1rem;letter-spacing:.05em;text-transform:uppercase;min-height:42px}
@@ -184,7 +192,7 @@ try {
 } catch (e) {}
 kanal = store.get('uel_kanal', '') || '';
 
-let runs = store.get('uel_runs_' + kanal, {}), sel = null, view = 'live', lastId = null, online = false, lastPoll = 0, abendTag = null;
+let coll = store.get('uel_coll', {}), runs = store.get('uel_runs_' + kanal, {}), sel = null, view = 'live', lastId = null, online = false, lastPoll = 0, abendTag = null;
 function save() {
   const keys = Object.keys(runs).sort((a, b) => runs[b].first - runs[a].first);
   keys.slice(80).forEach(k => delete runs[k]);
@@ -334,15 +342,25 @@ function renderFragen() {
   const run = currentRun(), el = $('vFragen');
   paintHead(run);
   if (!run || !run.e) { el.innerHTML = '<div class="empty">Noch keine Antworten vorhanden.</div>'; return; }
+  const disc = run.disc || {};
   let h = '<div class="sech" style="margin-top:0">' + esc(runTitle(run)) + '</div><div class="grid" style="grid-template-columns:1fr">';
   run.e.forEach((e, i) => {
-    const st = unitStats(run, i);
-    h += '<div class="tbox"><div class="th">' + vpill(run, i) + '<span class="sp"></span>' +
-      (st.rg !== null && st.rg !== undefined ? '<div class="hpill' + (st.rg ? ' tf' : ' has') + '"><span>Rufgruppenwechsel</span><b>' + (st.rg ? 'geklappt' : 'nicht geklappt') + '</b></div>' : '') +
+    const st = unitStats(run, i), ck = run.r + '|' + e, closed = !!coll[ck];
+    const wrongs = st.an.filter(x => !x.ok), besp = wrongs.filter(x => disc[e + '|' + x.s + '|' + x.q.id]).length;
+    h += '<div class="tbox"><div class="th fh" data-coll="' + esc(ck) + '"><span class="fold" aria-label="' + (closed ? 'aufklappen' : 'zuklappen') + '">' + (closed ? '▸' : '▾') + '</span>' + vpill(run, i) + '<span class="sp"></span>' +
+      (st.rg !== null && st.rg !== undefined ? '<div class="hpill lg' + (st.rg ? ' tf' : ' has') + '"><span>Rufgruppenwechsel</span><b>' + (st.rg ? 'geklappt' : 'nicht geklappt') + '</b></div>' : '') +
+      (wrongs.length ? '<div class="hpill md' + (besp === wrongs.length ? ' tf' : '') + '"><span>Besprochen</span><b>' + besp + '/' + wrongs.length + '</b></div>' : '') +
       '<div class="hpill tf"><span>Richtig</span><b>' + st.right + '</b></div><div class="hpill' + (st.wrong ? ' has' : '') + '"><span>Falsch</span><b>' + st.wrong + '</b></div></div>';
-    if (!st.an.length) h += '<div class="muted">Noch keine Antworten.</div>';
-    h += '<div class="qgrid">' + st.an.map(x => '<div class="q"><div class="lbl">Station ' + x.s + '</div><div class="t">' + esc(x.q.titel) + '</div><div class="l">' + esc(x.q.lage) + '</div>' +
-      x.q.opt.map((o, k) => '<div class="opt ' + (k === x.q.ok ? 'right' : k === x.ch ? 'wrong' : '') + '"><span class="m">' + (k === x.ch ? (x.ok ? '✓' : '✗') : k === x.q.ok ? '✓' : '') + '</span><span>' + esc(o) + (k === x.ch ? ' <i class="muted">(Antwort der Einheit)</i>' : '') + '</span></div>').join('') + '</div>').join('') + '</div></div>';
+    if (!closed) {
+      if (!st.an.length) h += '<div class="muted">Noch keine Antworten.</div>';
+      h += '<div class="qgrid">' + st.an.map(x => {
+        const dk = e + '|' + x.s + '|' + x.q.id, d = !!disc[dk];
+        return '<div class="q' + (!x.ok && d ? ' besp' : '') + '"><div class="lbl">Station ' + x.s + '</div><div class="t">' + esc(x.q.titel) + '</div><div class="l">' + esc(x.q.lage) + '</div>' +
+          x.q.opt.map((o, k) => '<div class="opt ' + (k === x.q.ok ? 'right' : k === x.ch ? 'wrong' : '') + '"><span class="m">' + (k === x.ch ? (x.ok ? '✓' : '✗') : k === x.q.ok ? '✓' : '') + '</span><span>' + esc(o) + (k === x.ch ? ' <i class="muted">(Antwort der Einheit)</i>' : '') + '</span></div>').join('') +
+          (x.ok ? '' : '<button class="chk' + (d ? ' on' : '') + '" data-disc="' + esc(dk) + '" data-r="' + esc(run.r) + '"><i>' + (d ? '✓' : '') + '</i>Mit der Einheit besprochen</button>') + '</div>';
+      }).join('') + '</div>';
+    }
+    h += '</div>';
   });
   el.innerHTML = h + '</div>';
 }
@@ -399,6 +417,12 @@ function render() {
 }
 $('tabs').addEventListener('click', ev => { const b = ev.target.closest('.tab'); if (b) show(b.dataset.v); });
 $('gear').onclick = () => show('set');
+$('vFragen').addEventListener('click', ev => {
+  const c = ev.target.closest('[data-disc]');
+  if (c) { const r = runs[c.dataset.r]; if (!r) return; r.disc = r.disc || {}; if (r.disc[c.dataset.disc]) delete r.disc[c.dataset.disc]; else r.disc[c.dataset.disc] = 1; save(); renderFragen(); return; }
+  const g = ev.target.closest('[data-coll]');
+  if (g) { const k = g.dataset.coll; if (coll[k]) delete coll[k]; else coll[k] = 1; store.set('uel_coll', coll); renderFragen(); }
+});
 $('vAbend').addEventListener('click', ev => {
   const d = ev.target.closest('[data-day]'); if (d) { abendTag = d.dataset.day; renderAbend(); return; }
   const r = ev.target.closest('[data-run]'); if (r) { sel = r.dataset.run; show('fragen'); }
