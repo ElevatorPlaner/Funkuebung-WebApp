@@ -17,12 +17,18 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .hide{display:none}
 .muted{color:var(--muted)}
 .top{background:var(--bg);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:10px 18px;min-height:84px}
-.top .rolle{font-family:var(--h);font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-.top .nr{font-family:var(--h);font-size:1.5rem;color:var(--amber);letter-spacing:.03em;line-height:1.1}
+.top .rolle{font-family:var(--h);font-size:1.15rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);line-height:1.2}
+.top .nr{font-family:var(--h);font-size:1.5rem;color:var(--fg);letter-spacing:.03em;line-height:1.1}
 .top .tm{color:var(--fg);opacity:.9}
 .tc{text-align:center}
 .clock{font-family:var(--h);font-size:3.6rem;line-height:1;font-weight:600;letter-spacing:.02em}
-.clock.warn{color:var(--amber)} .clock.crit{color:var(--red2)}
+.clock.warn{color:var(--amber);text-shadow:0 0 18px rgba(240,176,60,.5)}
+.clock.crit{color:var(--red2);text-shadow:0 0 20px rgba(217,68,47,.6);animation:puls 1s ease-in-out infinite}
+@keyframes puls{50%{opacity:.7}}
+@media (prefers-reduced-motion:reduce){.clock.crit{animation:none}}
+.snd{margin-left:auto;display:flex;align-items:center;gap:10px}
+.sndb{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--panel);display:inline-flex;align-items:center;justify-content:center}
+.sndhint{color:var(--amber);font-size:.85rem}
 .cl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .tr{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .hpill{display:inline-flex;align-items:center;gap:6px;height:30px;border-radius:999px;border:1px solid var(--line);background:#121a23;min-width:96px;justify-content:space-between;white-space:nowrap;padding:0 10px}
@@ -33,16 +39,17 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .hpill.md{min-width:130px} .hpill.lg{min-width:210px}
 .fold{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#121a23;color:var(--muted);font-size:.9rem;line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .th.fh{cursor:pointer}
-.chk{display:flex;align-items:center;gap:10px;margin-top:10px;padding:8px 12px;border-radius:8px;border:2px solid var(--amber);background:rgba(240,176,60,.12);width:100%;text-align:left;min-height:44px}
-.chk i{flex:none;width:26px;height:26px;border-radius:6px;border:2px solid var(--amber);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;color:#10200f}
+.chk{flex:none;margin-left:auto;display:inline-flex;align-items:center;gap:8px;padding:0 10px 0 8px;height:34px;border-radius:8px;border:1px solid var(--amber);background:rgba(240,176,60,.12);color:var(--fg);font-size:.85rem;white-space:nowrap}
+.chk i{flex:none;width:22px;height:22px;border-radius:5px;border:2px solid var(--amber);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-weight:700;color:#10200f;font-size:.9rem}
 .chk.on{border-color:var(--green);background:rgba(79,163,106,.14)}
 .chk.on i{background:var(--green);border-color:var(--green)}
+.opt{align-items:center}
 .q.besp{opacity:.78}
 .bar2{background:#121a23;border-top:1px solid var(--line);padding:8px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .tabs{display:flex;gap:8px}
 .tab{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:6px 18px;font-family:var(--h);font-size:1.1rem;letter-spacing:.05em;text-transform:uppercase;min-height:42px}
 .tab.on{background:var(--red);border-color:var(--red2)}
-.conn{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.conn{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
 .conn.off{color:var(--amber)}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--muted)} .dot.on{background:var(--green)} .dot.off{background:var(--red2)}
 .gear{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.85rem;padding:6px}
@@ -97,6 +104,7 @@ tr.click{cursor:pointer} tr.click:hover{background:var(--panel2)}
 .ul{display:flex;align-items:center;gap:10px;margin:3px 0;flex-wrap:wrap}
 .ul .tp{width:220px;height:30px;font-size:.9rem}
 .res.ok{color:var(--green)} .res.no{color:var(--red2)}
+.sech .uhr{font-family:var(--b);font-size:.75rem;letter-spacing:.04em;color:#e3e8ee;margin-left:6px;text-transform:none;vertical-align:middle}
 .sech{font-family:var(--h);font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em;margin:18px 0 8px;color:#fff}
 .worst{background:var(--box);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
 .btn{display:inline-block;background:var(--red2);border:0;border-radius:8px;padding:12px 20px;color:#fff;font-family:var(--h);font-size:1.2rem;letter-spacing:.06em;text-transform:uppercase;min-height:44px}
@@ -107,7 +115,7 @@ input[type=text]{width:100%;padding:12px;border-radius:8px;border:1px solid var(
 </style>
 </head>
 <body>
-<div class="top">
+<div class="top" id="top">
   <div><div class="rolle">Übungsleiter</div><div class="nr" id="hNr">Einsatz</div><div class="tm" id="hTm"></div></div>
   <div class="tc"><div class="clock" id="hClock" data-clock>--:--</div><div class="cl" id="hCl"></div></div>
   <div class="tr"><div class="hpill"><span>Module</span><b id="hMod">0/0</b></div><div class="hpill" id="hErrP"><span>Fehler</span><b id="hErr">0</b></div></div>
@@ -118,6 +126,7 @@ input[type=text]{width:100%;padding:12px;border-radius:8px;border:1px solid var(
     <button class="tab" data-v="fragen">Fragen</button>
     <button class="tab" data-v="abend">Abend</button>
   </div>
+  <div class="snd"><span class="sndhint" id="sndHint">Einmal antippen, damit der Ton geht</span><button class="sndb" id="sndBtn" aria-label="Ton"></button></div>
   <div class="conn" id="conn"><span class="dot" id="dot"></span><span id="connTxt">nicht verbunden</span><button class="gear" id="gear">Kanal</button></div>
 </div>
 <div class="wrap">
@@ -159,12 +168,13 @@ function runOf(r, time) {
   if (time < runs[r].first) runs[r].first = time;
   return runs[r];
 }
+const events = [];
 function ingest(m, time) {
   if (!m || !m.r || !m.t) return false;
-  const run = runOf(m.r, time);
+  const run = runOf(m.r, time), fresh = Date.now() / 1000 - time < 20;
   if (m.t === 'start') { Object.assign(run, { nr: m.nr, tm: m.tm, lim: m.lim, pn: m.pn, e: m.e, o: m.o, mn: m.mn, t0s: time }); return true; }
-  if (m.t === 'prog') { if (!run.prog || time >= run.prog._t) { run.prog = Object.assign({}, m, { _t: time }); if (!run.e) run.e = m.tl.map(u => u.e); } return true; }
-  if (m.t === 'end') { run.end = Object.assign({}, m, { _t: time }); return true; }
+  if (m.t === 'prog') { if (fresh && m.run && !(run.prog && run.prog.run)) events.push('start'); if (!run.prog || time >= run.prog._t) { run.prog = Object.assign({}, m, { _t: time }); if (!run.e) run.e = m.tl.map(u => u.e); } return true; }
+  if (m.t === 'end') { if (fresh && !run.end) events.push(m.ok ? 'ok' : 'err'); run.end = Object.assign({}, m, { _t: time }); return true; }
   if (m.t === 'ans') { run.ans[m.e + '|' + m.s] = { e: m.e, s: m.s, a: m.a || [], _t: time }; if (!run.e) run.e = [m.e]; return true; }
   if (m.t === 'arr') { run.arr[m.e + '|' + m.s] = time; return true; }
   return false;
@@ -186,6 +196,7 @@ async function poll() {
       if (ingest(m, o.time)) ch = true;
     });
     online = true; lastPoll = Date.now();
+    events.splice(0).forEach(ev => ev === 'start' ? sndStart() : ev === 'ok' ? sndOk() : sndErr());
     if (ch) { save(); render(); }
   } catch (e) { online = false; }
   paintConn();
@@ -194,6 +205,36 @@ function paintConn() {
   $('dot').className = 'dot ' + (kanal ? (online ? 'on' : 'off') : '');
   $('conn').classList.toggle('off', !!kanal && !online);
   $('connTxt').textContent = !kanal ? 'kein Kanal' : online ? 'ELW verbunden' : 'keine Verbindung';
+}
+
+/* ---------- Ton (wie in der Haupt-App) ---------- */
+let actx = null, soundOn = store.get('uel_sound', 1) !== 0, unlocked = false;
+function audio() { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); } catch (e) {} return actx; }
+function tone(freq, dur, type, vol, delay = 0) {
+  if (!soundOn || !unlocked) return; const c = audio(); if (!c) return;
+  const o = c.createOscillator(), g = c.createGain(), t = c.currentTime + delay;
+  o.type = type; o.frequency.value = freq; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .02);
+}
+const sndStart = () => { tone(196, 1.4, 'sine', .35); tone(294, 1.2, 'sine', .22, .02); tone(392, 1.0, 'sine', .12, .04); };
+const sndErr = () => { tone(150, .28, 'square', .12); tone(120, .28, 'square', .12, .18); };
+const sndOk = () => { tone(660, .15, 'sine', .2); tone(880, .25, 'sine', .2, .12); };
+const sndWarn = th => { const n = th === 90 ? 1 : th === 60 ? 2 : 3, f = th === 30 ? 1320 : 1040; for (let i = 0; i < n; i++) tone(f, .14, 'sine', .28, i * .24); };
+const ICON_ON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+const ICON_OFF = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M17 9.5l5 5M22 9.5l-5 5"/></svg>';
+function paintSound() { $('sndBtn').innerHTML = soundOn ? ICON_ON : ICON_OFF; $('sndBtn').title = soundOn ? 'Ton ist an' : 'Ton ist aus'; $('sndHint').classList.toggle('hide', unlocked || !soundOn); }
+function unlock() { if (unlocked) return; unlocked = true; audio(); paintSound(); }
+document.addEventListener('pointerdown', unlock, { once: false });
+$('sndBtn').addEventListener('click', () => { soundOn = !soundOn; store.set('uel_sound', soundOn ? 1 : 0); unlock(); paintSound(); if (soundOn) tone(660, .15, 'sine', .2); });
+/* Warnton bei 90, 60 und 30 Sekunden Restzeit, je Runde einmal. Beim Öffnen mitten in der Runde bleibt es still. */
+const warned = {};
+function warnCheck(run) {
+  if (!run || runState(run) !== 'run' || !run.lim) return 0;
+  const p = run.prog, left = run.lim - (p.el + (Date.now() / 1000 - p._t) + p.pen), w = warned[run.r] = warned[run.r] || {};
+  let hit = 0;
+  [90, 60, 30].forEach(th => { if (left <= th && left > 0 && !w[th]) { w[th] = 1; if (left > th - 8) hit = th; } });
+  if (hit) sndWarn(hit);
+  return hit;
 }
 
 /* ---------- Auswertung ---------- */
@@ -227,7 +268,7 @@ function clockOf(run) {
   if (st === 'end') return { txt: fmt(run.end.time), cls: '', lbl: 'Endzeit' };
   if (!p || !p.run) return { txt: run.lim ? fmt(run.lim) : '00:00', cls: '', lbl: 'Startet nach Funkcheck' };
   const el = p.el + (Date.now() / 1000 - p._t) + p.pen;
-  if (run.lim) { const left = run.lim - el; return { txt: fmt(Math.ceil(left)), cls: left <= 30 ? 'crit' : left <= 60 ? 'warn' : '', lbl: 'Restzeit' }; }
+  if (run.lim) { const left = run.lim - el; return { txt: fmt(Math.ceil(left)), cls: left <= 30 ? 'crit' : left <= 90 ? 'warn' : '', lbl: 'Restzeit' }; }
   return { txt: fmt(el), cls: '', lbl: 'Zeit' };
 }
 function paintHead(run) {
@@ -290,14 +331,14 @@ function renderLive() {
 /* ---------- Ansicht: Fragen (gruppiert je Einheit) ---------- */
 function runTitle(run) {
   const d = new Date(run.first * 1000);
-  return (run.nr || 'Übung') + (run.tm ? ', ' + run.tm : '') + ' (' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr)';
+  return esc((run.nr || 'Übung') + (run.tm ? ', ' + run.tm : '')) + ' <small class="uhr">' + d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr</small>';
 }
 function renderFragen() {
   const run = currentRun(), el = $('vFragen');
   paintHead(run);
   if (!run || !run.e) { el.innerHTML = '<div class="empty">Noch keine Antworten vorhanden.</div>'; return; }
   const disc = run.disc || {};
-  let h = '<div class="sech" style="margin-top:0">' + esc(runTitle(run)) + '</div><div class="grid" style="grid-template-columns:1fr">';
+  let h = '<div class="sech" style="margin-top:0">' + runTitle(run) + '</div><div class="grid" style="grid-template-columns:1fr">';
   run.e.forEach((e, i) => {
     const st = unitStats(run, i), ck = run.r + '|' + e, closed = !!coll[ck];
     const wrongs = st.an.filter(x => !x.ok), besp = wrongs.filter(x => disc[e + '|' + x.s + '|' + x.q.id]).length;
@@ -310,8 +351,8 @@ function renderFragen() {
       h += '<div class="qgrid">' + st.an.map(x => {
         const dk = e + '|' + x.s + '|' + x.q.id, d = !!disc[dk];
         return '<div class="q' + (!x.ok && d ? ' besp' : '') + '"><div class="lbl">Station ' + x.s + '</div><div class="t">' + esc(x.q.titel) + '</div><div class="l">' + esc(x.q.lage) + '</div>' +
-          x.q.opt.map((o, k) => '<div class="opt ' + (k === x.q.ok ? 'right' : k === x.ch ? 'wrong' : '') + '"><span class="m">' + (k === x.ch ? (x.ok ? '✓' : '✗') : k === x.q.ok ? '✓' : '') + '</span><span>' + esc(o) + (k === x.ch ? ' <i class="muted">(Antwort der Einheit)</i>' : '') + '</span></div>').join('') +
-          (x.ok ? '' : '<button class="chk' + (d ? ' on' : '') + '" data-disc="' + esc(dk) + '" data-r="' + esc(run.r) + '"><i>' + (d ? '✓' : '') + '</i>Mit der Einheit besprochen</button>') + '</div>';
+          x.q.opt.map((o, k) => '<div class="opt ' + (k === x.q.ok ? 'right' : k === x.ch ? 'wrong' : '') + '"><span class="m">' + (k === x.ch ? (x.ok ? '✓' : '✗') : k === x.q.ok ? '✓' : '') + '</span><span>' + esc(o) + (k === x.ch ? ' <i class="muted">(Antwort der Einheit)</i>' : '') + '</span>' +
+            (k === x.ch && !x.ok ? '<button class="chk' + (d ? ' on' : '') + '" data-disc="' + esc(dk) + '" data-r="' + esc(run.r) + '" title="Mit der Einheit besprochen"><i>' + (d ? '✓' : '') + '</i>Besprochen</button>' : '') + '</div>').join('') + '</div>';
       }).join('') + '</div>';
     }
     h += '</div>';
@@ -382,11 +423,11 @@ $('vAbend').addEventListener('click', ev => {
   const r = ev.target.closest('[data-run]'); if (r) { sel = r.dataset.run; show('fragen'); }
 });
 /* Uhr jede Sekunde nachziehen */
-setInterval(() => { const run = currentRun(); if (!run || view === 'set') return; const c = clockOf(run), el = $('hClock'); el.textContent = c.txt; el.className = 'clock ' + c.cls; $('hCl').textContent = c.lbl; }, 1000);
+setInterval(() => { const run = currentRun(); if (!run || view === 'set') return; warnCheck(run); const c = clockOf(run), el = $('hClock'); el.textContent = c.txt; el.className = 'clock ' + c.cls; $('hCl').textContent = c.lbl; }, 1000);
 /* Bildschirm anlassen */
 async function wake() { try { if (navigator.wakeLock) await navigator.wakeLock.request('screen'); } catch (e) {} }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { wake(); poll(); } });
-wake();
+wake(); paintSound();
 show(kanal ? 'live' : 'set');
 poll(); setInterval(poll, 3000);
 </script>
