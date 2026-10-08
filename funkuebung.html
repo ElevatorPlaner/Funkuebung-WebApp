@@ -355,7 +355,7 @@ table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-sp
           <div class="unit"><input type="text" id="tqK" autocomplete="off" spellcheck="false" title="Kanal geheim halten"></div>
         </div>
         <div class="tabrow">
-          <label class="f">Übungsleiter-Tablet</label>
+          <label class="f">Tablet Übungsleiter</label>
           <div class="tabbox">
             <canvas id="tqQrC" width="180" height="180" title="Antippen zum Vergrößern"></canvas>
             <div class="tabtxt"><b>Mit dem Tablet scannen</b><span id="tqTabNote">Öffnet die Übungsleiter-App und verbindet sie mit diesem Kanal.</span><button type="button" class="btn ghost" id="tqCp">Link kopieren</button></div>
@@ -369,7 +369,7 @@ table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-sp
       <summary>Zum Ausdrucken <i class="plsub">(Übungsvorbereitung)</i> <span id="plSum" class="plsum"></span></summary>
       <div class="plin">
         <div id="plList"></div>
-        <div class="plfoot"><span id="plCnt" class="plcnt"></span><button class="btn ghost" id="plAll">Alle drei öffnen</button></div>
+        <div class="plfoot"><button class="btn ghost" id="plQr" type="button">QR-Code Tablet Übungsleiter</button><span id="plCnt" class="plcnt"></span><button class="btn ghost" id="plAll">Alle drei öffnen</button></div>
       </div>
     </details>
 
@@ -897,7 +897,7 @@ $('#truppChips').onclick = e => {
   S.team1 = $('#team1').value.trim(); S.team2 = $('#team2').value.trim(); S.limit = Math.max(1, +$('#limit').value || 15); S.pen = Math.max(0, +$('#pen').value >= 0 && $('#pen').value !== '' ? +$('#pen').value : 15); S.fixnr = $('#fixnr').value.trim(); saveS();
 }));
 $('#tqUrl').addEventListener('input', () => { S.tqUrl = $('#tqUrl').value.trim(); saveS(); paintTab(); });
-$('#tqCp').addEventListener('click', tabCopy); $('#tqQrC').addEventListener('click', tabQr);
+$('#tqCp').addEventListener('click', tabCopy); $('#tqQrC').addEventListener('click', tabQr); $('#plQr').addEventListener('click', tabQr);
 $('#tqK').addEventListener('input', () => { S.tqK = $('#tqK').value.replace(/[^A-Za-z0-9_-]/g, ''); saveS(); paintTab(); });
 $('#segM').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.mset = b.dataset.v; setSeg('#segM', S.mset); saveS(); };
 $('#segR').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.rn = b.dataset.v; setSeg('#segR', S.rn); saveS(); };
@@ -1248,7 +1248,7 @@ function tabletLink() {
   return u + 'uebungsleiter.html?k=' + encodeURIComponent(S.tqK);
 }
 function paintTab() {
-  const el = $('#tqTab'); if (!el) return; const l = tabletLink(), cv = $('#tqQrC'); el.value = l; $('#tqCp').disabled = !l;
+  const el = $('#tqTab'); if (!el) return; const l = tabletLink(), cv = $('#tqQrC'); el.value = l; $('#tqCp').disabled = !l; $('#plQr').disabled = !l; $('#plQr').title = l ? '' : 'Erst Adresse und Kanal eintragen';
   const x = cv.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 180, 180); cv.classList.toggle('off', !l);
   $('#tqTabNote').textContent = l ? 'Öffnet die Übungsleiter-App und verbindet sie mit diesem Kanal.' : 'Erst Adresse und Kanal eintragen, dann erscheint hier der QR-Code.';
   if (l) { const q = qrCanvas(l, 180); x.drawImage(q, 0, 0, 180, 180); }
