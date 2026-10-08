@@ -255,6 +255,8 @@ td.dl{white-space:nowrap}
 #evening .wrap{max-width:860px}
 table.t th,table.t td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
 table.t th:nth-child(n+2),table.t td:nth-child(n+2){white-space:nowrap}
+.rp{display:inline-flex;align-items:center;justify-content:center;min-width:150px;height:24px;padding:0 12px;border-radius:999px;border:1px solid;font-weight:700;font-size:.8rem;white-space:nowrap}.rp.ok{color:var(--green);border-color:var(--green);background:rgba(79,163,106,.14)}.rp.no{color:var(--red2);border-color:var(--red2);background:rgba(217,68,47,.14)}
+.rb{margin-bottom:14px}.rb table.t td{padding:7px 10px}.rb table.t{table-layout:fixed}.rb table.t th:nth-child(2){width:176px}.rb table.t th:nth-child(3){width:76px}.rb table.t th:nth-child(4){width:120px}.rb table.t td:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
 .stat-ok{color:var(--green);font-weight:700} .stat-no{color:var(--red2);font-weight:700}
 /* Einsatzunterlagen */
@@ -429,7 +431,7 @@ table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-sp
       <div class="kpi"><b id="rErr"></b><span>Fehler</span></div>
       <div class="kpi"><b id="rMods"></b><span>Module gelöst</span></div>
     </div>
-    <div class="card"><table class="t"><thead><tr><th>Modul</th><th>Ergebnis</th><th>Fehler</th><th>Gelöst nach</th></tr></thead><tbody id="rBody"></tbody></table></div>
+    <div id="rBody"></div>
     <button class="btn" id="rHome" data-tip="Startseite" aria-label="Startseite"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg></button>
     <div class="links resl" style="margin-bottom:10px">
       <button class="btn primary" id="rAgain" style="font-size:1.1rem;padding:10px 20px">Nächste Gruppe</button>
@@ -1364,8 +1366,20 @@ plPaint(true);
 
 /* ---------- Ergebnis ---------- */
 let lastRec = null;
-function unitRows(r) {
-  return (r.units || []).map(u => `<tr class="fr"><td>${esc(DATA.ort + ' ' + u.e + ': Zeit' + (u.done ? ', Strafzeit ' + fmt(u.pen) : ''))}</td><td class="${u.done ? 'stat-ok' : 'stat-no'}">${u.done ? 'fertig' : 'offen'}</td><td>${u.errs}</td><td>${u.done ? fmt(u.time) : '-'}</td></tr>`).join('');
+const rp = (txt, ok) => `<span class="rp ${ok ? 'ok' : 'no'}">${txt}</span>`;
+function resultBody(r) {
+  const ort = DATA.ort, multi = r.trupps.length > 1;
+  return r.trupps.map((e, i) => {
+    const mods = r.mods.filter(m => m.t === e || !multi), short = m => m.name.replace(ort + ' ' + e + ': ', '');
+    const fr = (r.fragen || []).filter(f => f.e === e), au = (r.aufgaben || []).filter(f => f.e === e), u = (r.units || []).find(x => x.e === e);
+    const wrong = fr.filter(f => !f.ok).length, solved = mods.filter(m => m.solved).length;
+    const err = u ? u.errs : mods.reduce((a, m) => a + m.errors, 0) + wrong + au.filter(f => !f.ok).length;
+    let rows = mods.map(m => `<tr><td>${esc(short(m))}</td><td>${rp(m.solved ? 'gelöst' : 'offen', m.solved)}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('');
+    rows += au.map(f => `<tr class="fr"><td>${esc(f.titel)}</td><td>${rp(f.ok ? 'geklappt' : 'nicht geklappt', f.ok)}</td><td>${f.ok ? 0 : 1}</td><td>-</td></tr>`).join('');
+    if (fr.length) rows += `<tr class="fr"><td>Technikfragen</td><td>${rp((fr.length - wrong) + ' richtig' + (wrong ? ', ' + wrong + ' falsch' : ''), wrong === 0)}</td><td>${wrong}</td><td>-</td></tr>`;
+    if (u) rows += `<tr class="fr"><td>Zeit der Einheit${u.done ? ' (Strafzeit ' + fmt(u.pen) + ')' : ''}</td><td>${rp(u.done ? 'fertig' : 'offen', u.done)}</td><td>${u.errs}</td><td>${u.done ? fmt(u.time) : '-'}</td></tr>`;
+    return `<div class="tbox rb"><div class="th"><span class="tp">${esc(DATA.funk[i % 2 === 0 ? 'TMO' : 'DMO'].prefix + ' ' + ort + ' ' + e)}</span><span class="sp2"></span><div class="hpill"><span>Module</span><b>${solved}/${mods.length}</b></div><div class="hpill${err ? ' has' : ''}"><span>Fehler</span><b>${err}</b></div></div><table class="t"><thead><tr><th>Modul</th><th>Ergebnis</th><th>Fehler</th><th>Gelöst nach</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('');
 }
 function showResult(r) {
   lastRec = r;
@@ -1374,7 +1388,7 @@ function showResult(r) {
   $('#rTeam').textContent = 'ELW: ' + r.team + '   |   Einheiten: ' + r.trupps.map(t => DATA.ort + ' ' + t).join(', ');
   $('#rTime').textContent = fmt(r.time); $('#rErr').textContent = r.errs;
   $('#rMods').textContent = r.mods.filter(m => m.solved).length + '/' + r.mods.length;
-  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('') + r.trupps.map(e => { const fr = (r.fragen || []).filter(f => f.e === e), ok = fr.filter(f => f.ok).length, no = fr.length - ok; return fr.length ? `<tr class="fr"><td>${esc(DATA.ort + ' ' + e + ': Technikfragen')}</td><td><span class="stat-ok">${ok} richtig</span>${no ? `, <span class="stat-no">${no} falsch</span>` : ''}</td><td>${no}</td><td>-</td></tr>` : ''; }).join('') + (r.aufgaben || []).map(f => `<tr class="fr"><td>${esc(DATA.ort + ' ' + f.e + ': ' + f.titel)}</td><td class="${f.ok ? 'stat-ok' : 'stat-no'}">${f.ok ? 'geklappt' : 'nicht geklappt'}</td><td>${f.ok ? 0 : 1}</td><td>-</td></tr>`).join('') + unitRows(r);
+  $('#rBody').innerHTML = resultBody(r);
   show('result');
 }
 $('#rAgain').onclick = () => { initStart(); tryStart(); };
@@ -1479,7 +1493,7 @@ function roundCanvas(r, bg) {
   let y = 470;
   grp.forEach(g => {
     x.fillStyle = '#17202B'; x.fillRect(50, y, W - 100, 56);
-    x.fillStyle = '#F0B03C'; x.font = OS; x.fillText(DATA.funk.TMO.prefix + ' ' + ort + ' ' + g.e, 70, y + 38);
+    x.fillStyle = '#F0B03C'; x.font = OS; x.fillText(DATA.funk[grp.indexOf(g) % 2 === 0 ? 'TMO' : 'DMO'].prefix + ' ' + ort + ' ' + g.e, 70, y + 38);
     x.fillStyle = '#C9D1DA'; x.font = '600 20px ' + BF; x.textAlign = 'right';
     x.fillText('Module ' + g.ok + '/' + g.mods.length + '     Fehler ' + g.err, W - 70, y + 36); x.textAlign = 'left';
     y += GH - 8;
