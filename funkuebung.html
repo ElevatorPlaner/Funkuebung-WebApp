@@ -1512,10 +1512,9 @@ function roundCanvas(r, bg) {
   const CX = [70, 520, 800, 940];
   let y = 470;
   grp.forEach((g, gi) => {
-    // Kopf wie in der Auswertung: Fahrzeug-Pille links, Pillen Module und Fehler rechts
+    // Kopf: Einheit als gelber Text, rechts die Pillen Module und Fehler
     x.fillStyle = '#17202B'; x.fillRect(50, y, W - 100, 62);
-    const nm = DATA.funk[gi % 2 === 0 ? 'TMO' : 'DMO'].prefix + ' ' + ort + ' ' + g.e;
-    pill(66, y + 11, 330, 40, '#F0B03C'); x.fillStyle = '#17202B'; x.font = "700 22px " + BF; x.textAlign = 'center'; x.fillText(nm, 66 + 165, y + 38); x.textAlign = 'left';
+    x.fillStyle = '#F0B03C'; x.font = OS; x.fillText(DATA.funk[gi % 2 === 0 ? 'TMO' : 'DMO'].prefix + ' ' + ort + ' ' + g.e, 70, y + 42);
     const hp = (rx, lab, val, red) => { const pw = 168; pill(rx - pw, y + 15, pw, 32, red ? 'rgba(217,68,47,.22)' : '#121a23', red ? '#D9442F' : '#3A4A5C'); x.font = '600 14px ' + BF; x.fillStyle = '#C9D1DA'; x.fillText(lab, rx - pw + 18, y + 36); x.font = '700 17px ' + BF; x.fillStyle = red ? '#E8503A' : '#F5F2EB'; x.textAlign = 'right'; x.fillText(val, rx - 18, y + 37); x.textAlign = 'left'; };
     hp(W - 70, 'FEHLER', String(g.err), g.err > 0); hp(W - 70 - 168 - 12, 'MODULE', g.ok + '/' + g.mods.length, false);
     y += 62 + 34;
