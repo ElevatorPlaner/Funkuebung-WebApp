@@ -7,6 +7,6 @@
 ## Handy-Seite veröffentlichen
 
 1. Repo-Einstellungen, Pages, Source: **GitHub Actions**.
-2. Der Workflow `.github/workflows/pages.yml` läuft bei jeder Änderung an `fragen.html` auf `main`.
+2. Der Workflow `.github/workflows/pages.yml` läuft bei jeder Änderung an `fragen.html` auf dem Standard-Branch.
 3. Adresse der Seite (ohne Dateinamen) in der App unter Einstellungen, "Technikfragen: Adresse" eintragen:
    `https://elevatorplaner.github.io/Funkuebung-WebApp/`

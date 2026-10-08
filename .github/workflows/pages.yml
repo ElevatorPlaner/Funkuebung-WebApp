@@ -2,7 +2,7 @@ name: Handy-Seite veroeffentlichen
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/new-session-o2eqi2]
     paths: [fragen.html, .github/workflows/pages.yml]
   workflow_dispatch:
 
