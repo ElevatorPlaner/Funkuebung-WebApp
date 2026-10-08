@@ -17,6 +17,7 @@ Privates Projekt von Christian Görlich (Feuerwehr Aidlingen, ELW-Team). Mit Chr
 - Keine KI-typischen Muster: keine Floskeln, Superlative, erzwungenen Gegensatzpaare, kein Marketing-Sprech.
 - Rolle heißt "Übungsleiter" (nicht Ausbilder). "Kommunikatoren ELW" überall. "Kommunikatoren im ELW" nur als Beschriftung über den Namensfeldern und vor den Namen in der Tablet-Kopfzeile (dort mit Doppelpunkt). Schritt 1 heißt "Rufgruppe und Funkcheck".
 - Fahrzeug ist gleich Einheit.
+- Es ist eine Fachapp für den Feuerwehr-Funkdienst. Fachbegriffe wie "BOS-Kennung", TMO, DMO, Rufgruppe, Kurzwahl oder Funkcheck bleiben stehen und werden nicht umgangssprachlich umbenannt. Nutzer sind Feuerwehrangehörige, die sie kennen.
 
 ## Gestaltung
 
