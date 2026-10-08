@@ -1364,7 +1364,7 @@ function showResult(r) {
   $('#rTeam').textContent = 'Team: ' + r.team + '   |   Einheiten: ' + r.trupps.map(t => DATA.ort + ' ' + t).join(', ');
   $('#rTime').textContent = fmt(r.time); $('#rErr').textContent = r.errs;
   $('#rMods').textContent = r.mods.filter(m => m.solved).length + '/' + r.mods.length;
-  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('') + (r.fragen || []).map(f => `<tr class="fr"><td>${esc(DATA.ort + ' ' + f.e + ', Station ' + f.s + ': ' + f.titel)}</td><td class="${f.ok ? 'stat-ok' : 'stat-no'}">${f.ok ? 'richtig' : 'falsch'}</td><td>${f.ok ? 0 : 1}</td><td>-</td></tr>`).join('') + (r.aufgaben || []).map(f => `<tr class="fr"><td>${esc(DATA.ort + ' ' + f.e + ': ' + f.titel)}</td><td class="${f.ok ? 'stat-ok' : 'stat-no'}">${f.ok ? 'geklappt' : 'nicht geklappt'}</td><td>${f.ok ? 0 : 1}</td><td>-</td></tr>`).join('');
+  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('') + r.trupps.map(e => { const fr = (r.fragen || []).filter(f => f.e === e), ok = fr.filter(f => f.ok).length, no = fr.length - ok; return fr.length ? `<tr class="fr"><td>${esc(DATA.ort + ' ' + e + ': Technikfragen')}</td><td><span class="stat-ok">${ok} richtig</span>, <span class="${no ? 'stat-no' : 'stat-ok'}">${no} falsch</span></td><td>${no}</td><td>-</td></tr>` : ''; }).join('') + (r.aufgaben || []).map(f => `<tr class="fr"><td>${esc(DATA.ort + ' ' + f.e + ': ' + f.titel)}</td><td class="${f.ok ? 'stat-ok' : 'stat-no'}">${f.ok ? 'geklappt' : 'nicht geklappt'}</td><td>${f.ok ? 0 : 1}</td><td>-</td></tr>`).join('');
   show('result');
 }
 $('#rAgain').onclick = () => { initStart(); tryStart(); };
@@ -1400,7 +1400,7 @@ function eveningLines(list) {
     L.push(['   ' + r.reason + ', Zeit ' + fmt(r.time) + ', Fehler ' + r.errs + ', Module ' + r.mods.filter(m => m.solved).length + '/' + r.mods.length, 11, 0]);
     r.mods.forEach(m => L.push(['      ' + m.name + ': ' + (m.solved ? 'gelöst' : 'offen') + ', Fehler ' + m.errors, 10, 0]));
     (r.aufgaben || []).forEach(f => L.push(['      ' + f.titel + ' ' + DATA.ort + ' ' + f.e + ': ' + (f.ok ? 'geklappt' : 'nicht geklappt'), 10, 0]));
-    (r.fragen || []).forEach(f => L.push(['      Technikfrage ' + DATA.ort + ' ' + f.e + ', Station ' + f.s + ', ' + f.titel + ': ' + (f.ok ? 'richtig' : 'falsch'), 10, 0]));
+    r.trupps.forEach(e => { const fr = (r.fragen || []).filter(f => f.e === e), ok = fr.filter(f => f.ok).length; if (fr.length) L.push(['      Technikfragen ' + DATA.ort + ' ' + e + ': ' + ok + ' richtig, ' + (fr.length - ok) + ' falsch', 10, 0]); });
     L.push(['', 8, 0]);
   });
   const ok = list.filter(r => r.ok).length, err = list.reduce((a, r) => a + r.errs, 0);
@@ -1453,7 +1453,7 @@ function roundCanvas(r, bg) {
     const au = (r.aufgaben || []).filter(f => f.e === e);
     return { e, mods, fr, au, err: mods.reduce((a, m) => a + m.errors, 0) + fr.filter(f => !f.ok).length + au.filter(f => !f.ok).length, ok: mods.filter(m => m.solved).length };
   });
-  const rowsN = grp.reduce((a, g) => a + g.mods.length + g.fr.length + g.au.length, 0), RH = 44, GH = 78;
+  const rowsN = grp.reduce((a, g) => a + g.mods.length + (g.fr.length ? 1 : 0) + g.au.length, 0), RH = 44, GH = 78;
   const W = 1200, H = 470 + grp.length * GH + rowsN * RH + 50, c = document.createElement('canvas'); c.width = W; c.height = H;
   const x = c.getContext('2d'); const H1 = "600 56px Oswald,'Arial Narrow',Impact,sans-serif", BF = "'Public Sans','Segoe UI',Arial,sans-serif", OS = "600 30px Oswald,'Arial Narrow',Impact,sans-serif";
   x.fillStyle = bg || '#F5F2EB'; x.fillRect(0, 0, W, H); x.fillStyle = '#B8321F'; x.fillRect(0, 0, W, 16);
@@ -1481,7 +1481,7 @@ function roundCanvas(r, bg) {
     };
     g.mods.forEach(m => row(m.short, m.solved ? 'gelöst nach ' + fmt(m.at) : 'offen', m.solved, 'Fehler ' + m.errors));
     g.au.forEach(f => row(f.titel, f.ok ? 'geklappt' : 'nicht geklappt', f.ok, 'Fehler ' + (f.ok ? 0 : 1)));
-    g.fr.forEach(f => row('Technikfrage Station ' + f.s + ': ' + f.titel, f.ok ? 'richtig' : 'falsch', f.ok, 'Fehler ' + (f.ok ? 0 : 1)));
+    if (g.fr.length) { const no = g.fr.filter(f => !f.ok).length; row('Technikfragen', (g.fr.length - no) + ' richtig, ' + no + ' falsch', no === 0, 'Fehler ' + no); }
     y += 8;
   });
   return c;
