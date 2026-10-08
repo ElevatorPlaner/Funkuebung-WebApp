@@ -56,7 +56,7 @@ details.card .inner .chips{display:grid;grid-template-columns:repeat(auto-fill,1
 details.card .inner .chip{height:42px;padding:0 8px;border-radius:999px;width:152px}
 @media (max-width:640px){details.card .inner{grid-template-columns:1fr}details.card .inner>div{grid-column:1/-1!important}}
 details.card .inner .seg button{font-size:.9rem;padding:6px 4px}
-.unit{position:relative}.unit input{padding-right:100px}.unit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.unit{position:relative}.unit input{padding-right:100px}.unit.ns input{padding-right:14px}.unit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
 .unit input[type=number]{-moz-appearance:textfield}.unit input::-webkit-outer-spin-button,.unit input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;height:1.2em}.lab label.f{margin:0}
 .cnt2{font-size:.85rem;color:var(--muted)}.cnt2 b{color:var(--amber)}
@@ -339,7 +339,8 @@ table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-sp
         </div>
         <div>
           <label class="f" for="fixnr">Feste Einsatz-Nr.</label>
-          <div class="unit"><input type="text" id="fixnr" placeholder="optional" autocomplete="off"></div>
+          <div class="unit ns"><input type="text" id="fixnr" placeholder="2026-10-08_001" autocomplete="off"></div>
+          <div class="hint sub" style="text-align:left;margin-top:4px">Optional: legt die Aufgaben fest.</div>
         </div>
       </div>
     </details>
