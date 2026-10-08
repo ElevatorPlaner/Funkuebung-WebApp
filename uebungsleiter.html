@@ -316,7 +316,7 @@ function renderLive() {
   let top = '';
   if (stale) top += '<div class="banner bad">Seit ' + fmt(Date.now() / 1000 - p._t) + ' Minuten keine Meldung vom ELW. Läuft die App noch und hat der ELW-PC Internet?</div>';
   if (spread) {
-    const lead = stats.filter(s => s.steps === max).map(s => rufname(startMode(run, run.e.indexOf(s.e)), s.e)).join(' und '), back = stats.filter(s => s.steps === min).map(s => rufname(startMode(run, run.e.indexOf(s.e)), s.e)).join(' und ');
+    const lead = stats.filter(s => s.steps === max).map(s => ORT + ' ' + s.e).join(' und '), back = stats.filter(s => s.steps === min).map(s => ORT + ' ' + s.e).join(' und ');
     top += '<div class="banner">' + esc(lead) + ' liegt ' + (max - min) + ' Schritte vor ' + esc(back) + '.</div>';
   }
   if (state === 'end') top += '<div class="banner' + (run.end.ok ? '' : ' bad') + '">' + esc(run.end.reason || 'Übung beendet') + '</div>';
