@@ -28,6 +28,8 @@ Privates Projekt von Christian Görlich (Feuerwehr Aidlingen, ELW-Team). Mit Chr
 - PDFs auf möglichst wenig Seiten, Fließtext im Blocksatz, in neuem Tab öffnen.
 - Schwebende Scrollbars. Bei mehreren Einheiten scrollt nur der Einheiten-Bereich, nie die Kopfzeile.
 - Das Tablet-Design (Übungsleiter) muss der Haupt-App sehr ähnlich sehen (Kopfzeile, Pillen, Kästen).
+- Gemeinsame Elemente sind in V2, Standalone und Übungsleiter-App immer identisch gestaltet und verhalten sich gleich (zum Beispiel Uhrfarben: orange ab 90 Sekunden, rot ab 30, Töne bei 90, 60 und 30 Sekunden Restzeit, Tonsymbol und Tooltips). Wird eines geändert, die anderen mitziehen.
+- Es gibt keine Obergrenze für die Zahl der Einheiten (alle 8 wählbar).
 
 ## Arbeitsweise
 

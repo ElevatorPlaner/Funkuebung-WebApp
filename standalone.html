@@ -86,6 +86,8 @@ details.card .inner .seg button{font-size:.9rem;padding:6px 4px}
 .plcnt{color:var(--green);font-size:.85rem;min-width:0}
 .plfoot .btn{min-height:0;height:34px;padding:0 16px;font-size:.88rem}
 .links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:flex-end}
+.links.resl{justify-content:flex-start}
+#result .wrap{position:relative}#rHome{position:absolute;top:22px;right:0;width:44px;padding:0;display:grid;place-items:center}
 /* Spiel */
 #game.on{display:grid;grid-template-rows:auto 1fr;overflow:hidden}
 .top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
@@ -98,7 +100,10 @@ details.card .inner .seg button{font-size:.9rem;padding:6px 4px}
 #funkBar .mp[data-tip]{cursor:help}#funkBar .mp[data-tip]:hover::after{left:0;right:auto;white-space:nowrap;max-width:none}
 #gAbort.arm{width:auto;padding:0 14px;border-color:var(--red2);color:var(--red2);font-weight:700}
 [data-tip]:hover::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);right:0;z-index:30;width:max-content;max-width:260px;padding:6px 10px;border-radius:8px;background:#0b1118;border:1px solid var(--line);color:var(--fg);font:500 .78rem/1.3 var(--b);letter-spacing:0;text-transform:none;text-align:left;white-space:normal;box-shadow:0 6px 18px rgba(0,0,0,.5);pointer-events:none}
-.clock.warn{color:var(--amber)} .clock.crit{color:var(--red2)}
+.clock.warn{color:var(--amber);text-shadow:0 0 18px rgba(240,176,60,.5)}
+.clock.crit{color:var(--red2);text-shadow:0 0 20px rgba(217,68,47,.6);animation:puls 1s ease-in-out infinite}
+@keyframes puls{50%{opacity:.7}}
+@media (prefers-reduced-motion:reduce){.clock.crit{animation:none}}
 .clock small{display:block;font-family:var(--b);font-size:.72rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;font-weight:400}
 .pen{position:absolute;right:-70px;top:6px;color:var(--red2);font-size:1.1rem;opacity:0;transition:opacity .3s}
 .pen.show{opacity:1}
@@ -243,6 +248,7 @@ td.dl{white-space:nowrap}
 #eBody td:first-child{white-space:nowrap}
 #evening .wrap{max-width:860px}
 table.t th,table.t td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+table.t th:nth-child(n+2),table.t td:nth-child(n+2){white-space:nowrap}
 table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
 .stat-ok{color:var(--green);font-weight:700} .stat-no{color:var(--red2);font-weight:700}
 /* Einsatzunterlagen */
@@ -395,13 +401,13 @@ table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-sp
       <div class="kpi"><b id="rMods"></b><span>Module gelöst</span></div>
     </div>
     <div class="card"><table class="t"><thead><tr><th>Modul</th><th>Ergebnis</th><th>Fehler</th><th>Gelöst nach</th></tr></thead><tbody id="rBody"></tbody></table></div>
-    <div class="links" style="margin-bottom:10px">
+    <button class="btn" id="rHome" data-tip="Startseite" aria-label="Startseite"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg></button>
+    <div class="links resl" style="margin-bottom:10px">
       <button class="btn primary" id="rAgain" style="font-size:1.1rem;padding:10px 20px">Nächste Gruppe</button>
-      <button class="btn" id="rHome">Startseite</button>
     </div>
     <div class="links">
-      <button class="btn ghost" id="rPdf">Runde als PDF</button>
-      <button class="btn ghost" id="rJpg">Runde als JPG</button>
+      <button class="btn ghost" id="rPdf">Runde (PDF)</button>
+      <button class="btn ghost" id="rJpg">Runde (JPG)</button>
       <button class="btn ghost" id="rEve">Abendauswertung</button>
     </div>
   </div>
@@ -805,7 +811,7 @@ function initStart() {
   setSeg('#segMode', S.mode); setSeg('#segSound', String(S.sound)); setSeg('#segB', S.bmode); setSeg('#segM', S.mset); setSeg('#segR', S.rn);
   $('#limitBox').style.visibility = S.mode === 'limit' ? 'visible' : 'hidden';
   $('#truppChips').innerHTML = DATA.trupps.map(t => `<button class="chip ${S.trupps.includes(t) ? 'on' : ''}" data-t="${t}">${DATA.ort} ${t}</button>`).join('');
-  $('#truppCnt').innerHTML = '<b>' + S.trupps.length + '</b> von 2 gewählt';
+  $('#truppCnt').innerHTML = '<b>' + S.trupps.length + '</b> gewählt';
   $('#nextNr').textContent = nextNr();
   const n = store.get('funks_runden_' + today(), []).length;
   $('#toEvening').textContent = 'Abendauswertung' + (n ? ' (' + n + ' Runde' + (n > 1 ? 'n' : '') + ')' : '');
@@ -817,7 +823,7 @@ $('#segSound').onclick = e => { const b = e.target.closest('button'); if (!b) re
 $('#truppChips').onclick = e => {
   const b = e.target.closest('.chip'); if (!b) return; const t = b.dataset.t;
   if (S.trupps.includes(t)) { if (S.trupps.length > 1) S.trupps = S.trupps.filter(x => x !== t); }
-  else { S.trupps.push(t); if (S.trupps.length > 2) S.trupps.shift(); }
+  else S.trupps.push(t);
   initStart(); saveS();
 };
 ['team1', 'team2', 'limit', 'pen', 'fixnr'].forEach(id => $('#' + id).addEventListener('input', () => {
@@ -922,7 +928,7 @@ function loop() {
   if (!G || G.ended) return;
   const t = total(), c = $('#clock');
   let shown = t; c.classList.remove('warn', 'crit'); c.classList.toggle('wait', !G.t0); $('#clockLbl').textContent = !G.t0 ? 'Startet nach Funkcheck' : G.cfg.mode === 'limit' ? 'Restzeit' : 'Zeit';
-  if (G.cfg.mode === 'limit') { shown = G.cfg.limit - t; if (shown <= 60) c.classList.add('warn'); if (shown <= 30) c.classList.add('crit'); }
+  if (G.cfg.mode === 'limit') { shown = G.cfg.limit - t; if (shown <= 90) c.classList.add('warn'); if (shown <= 30) c.classList.add('crit'); }
   c.firstChild.nodeValue = fmt(Math.max(0, G.cfg.mode === 'limit' ? Math.ceil(shown) : Math.floor(shown)));
   if (G.t0 && G.cfg.mode === 'limit') { let hit = 0; [90, 60, 30].forEach(th => { if (G.cfg.limit > th && shown <= th && shown > 0 && !G.wd[th]) { G.wd[th] = 1; hit = th; } }); if (hit) sndWarn(hit); }
   if (G.cfg.mode === 'limit' && shown <= 0) endGame('Zeit abgelaufen');
@@ -958,7 +964,7 @@ function onError(m) {
 }
 function onSolved(m) {
   if (G.ended || m.solved) return;
-  m.solved = true; m.at = total(); m.card.classList.add('solved'); sndOk(); updateHud();
+  m.solved = true; m.at = total(); m.raw = G.t0 ? (Date.now() - G.t0) / 1000 : 0; m.card.classList.add('solved'); sndOk(); updateHud();
   if (G.mods.every(x => x.solved)) setTimeout(() => endGame('Lage gesichert'), 700);
 }
 function endGame(reason) {
@@ -968,6 +974,7 @@ function endGame(reason) {
     nr: G.nr, date: today(), team: G.cfg.team, reason, ok: reason === 'Lage gesichert',
     mode: G.cfg.mode, limit: G.cfg.limit, pen: G.cfg.pen, fixnr: G.cfg.fixnr, trupps: G.cfg.trupps,
     time: G.cfg.mode === 'limit' && reason === 'Zeit abgelaufen' ? G.cfg.limit : t, errs: G.errs,
+    units: G.tl.map(e => { const ms = G.mods.filter(m => m.trupp === e), done = ms.every(m => m.solved), errs = ms.reduce((a, m) => a + m.errors, 0), pen = errs * G.cfg.pen; return { e, done, errs, pen, time: done ? Math.max(0, ...ms.map(m => m.raw || 0)) + pen : null }; }),
     mods: G.mods.map(m => ({ t: m.trupp, name: (G.cfg.trupps.length > 1 ? DATA.ort + ' ' + m.trupp + ': ' : '') + m.def.name, solved: m.solved, errors: m.errors, at: m.at }))
   };
   const list = store.get('funks_runden_' + today(), []); list.push(rec); store.set('funks_runden_' + today(), list);
@@ -1016,14 +1023,17 @@ plPaint(true);
 
 /* ---------- Ergebnis ---------- */
 let lastRec = null;
+function unitRows(r) {
+  return (r.units || []).map(u => `<tr class="fr"><td>${esc(DATA.ort + ' ' + u.e + ': Zeit' + (u.done ? ', Strafzeit ' + fmt(u.pen) : ''))}</td><td class="${u.done ? 'stat-ok' : 'stat-no'}">${u.done ? 'fertig' : 'offen'}</td><td>${u.errs}</td><td>${u.done ? fmt(u.time) : '-'}</td></tr>`).join('');
+}
 function showResult(r) {
   lastRec = r;
   $('#rNr').textContent = 'Einsatz-Nr. ' + r.nr;
   const h = $('#rHead'); h.textContent = r.reason; h.className = 'big2 ' + (r.ok ? 'ok' : 'bad');
-  $('#rTeam').textContent = 'Team: ' + r.team + '   |   Einheiten: ' + r.trupps.map(t => DATA.ort + ' ' + t).join(', ');
+  $('#rTeam').textContent = 'ELW: ' + r.team + '   |   Einheiten: ' + r.trupps.map(t => DATA.ort + ' ' + t).join(', ');
   $('#rTime').textContent = fmt(r.time); $('#rErr').textContent = r.errs;
   $('#rMods').textContent = r.mods.filter(m => m.solved).length + '/' + r.mods.length;
-  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('');
+  $('#rBody').innerHTML = r.mods.map(m => `<tr><td>${esc(m.name)}</td><td class="${m.solved ? 'stat-ok' : 'stat-no'}">${m.solved ? 'gelöst' : 'offen'}</td><td>${m.errors}</td><td>${m.at != null ? fmt(m.at) : '-'}</td></tr>`).join('') + unitRows(r);
   show('result');
 }
 $('#rAgain').onclick = () => { initStart(); tryStart(); };
@@ -1058,6 +1068,7 @@ function eveningLines(list) {
     L.push([r.nr + '   ' + r.team, 12, 1]);
     L.push(['   ' + r.reason + ', Zeit ' + fmt(r.time) + ', Fehler ' + r.errs + ', Module ' + r.mods.filter(m => m.solved).length + '/' + r.mods.length, 11, 0]);
     r.mods.forEach(m => L.push(['      ' + m.name + ': ' + (m.solved ? 'gelöst' : 'offen') + ', Fehler ' + m.errors, 10, 0]));
+    (r.units || []).forEach(u => L.push(['      ' + DATA.ort + ' ' + u.e + ', Zeit der Einheit: ' + (u.done ? fmt(u.time) + ' (davon Strafzeit ' + fmt(u.pen) + ')' : 'offen'), 10, 0]));
     L.push(['', 8, 0]);
   });
   const ok = list.filter(r => r.ok).length, err = list.reduce((a, r) => a + r.errs, 0);
@@ -1106,16 +1117,16 @@ function roundCanvas(r, bg) {
   const ort = DATA.ort, multi = r.trupps.length > 1;
   const grp = r.trupps.map(e => {
     const mods = r.mods.filter(m => m.t === e || m.name.startsWith(ort + ' ' + e + ': ') || !multi).map(m => Object.assign({}, m, { short: m.name.replace(ort + ' ' + e + ': ', '') }));
-    return { e, mods, err: mods.reduce((a, m) => a + m.errors, 0), ok: mods.filter(m => m.solved).length };
+    const u = (r.units || []).find(x => x.e === e); return { e, mods, u, err: mods.reduce((a, m) => a + m.errors, 0), ok: mods.filter(m => m.solved).length };
   });
-  const rowsN = grp.reduce((a, g) => a + g.mods.length, 0), RH = 44, GH = 78;
+  const rowsN = grp.reduce((a, g) => a + g.mods.length + (g.u ? 1 : 0), 0), RH = 44, GH = 78;
   const W = 1200, H = 470 + grp.length * GH + rowsN * RH + 50, c = document.createElement('canvas'); c.width = W; c.height = H;
   const x = c.getContext('2d'); const H1 = "600 56px Oswald,'Arial Narrow',Impact,sans-serif", BF = "'Public Sans','Segoe UI',Arial,sans-serif", OS = "600 30px Oswald,'Arial Narrow',Impact,sans-serif";
   x.fillStyle = bg || '#F5F2EB'; x.fillRect(0, 0, W, H); x.fillStyle = '#B8321F'; x.fillRect(0, 0, W, 16);
   x.fillStyle = '#17202B'; x.font = OS; x.fillText('FUNKÜBUNG ELW', 50, 74);
   x.fillStyle = '#4A5563'; x.font = "600 26px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText('Einsatz-Nr. ' + r.nr, 50, 116);
   x.fillStyle = r.ok ? '#2F7D4B' : '#B8321F'; x.font = "600 38px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText(r.reason.toUpperCase(), 50, 180);
-  x.fillStyle = '#17202B'; x.font = '20px ' + BF; x.fillText('Team: ' + r.team, 50, 236); x.fillText('Einheiten: ' + r.trupps.map(t => ort + ' ' + t).join(', '), 50, 266);
+  x.fillStyle = '#17202B'; x.font = '20px ' + BF; x.fillText('ELW: ' + r.team, 50, 236); x.fillText('Einheiten: ' + r.trupps.map(t => ort + ' ' + t).join(', '), 50, 266);
   [['Gesamtzeit', fmt(r.time)], ['Fehler', String(r.errs)], ['Module gelöst', r.mods.filter(m => m.solved).length + '/' + r.mods.length]].forEach((k, i) => {
     const bx = 50 + i * 290; x.fillStyle = '#17202B'; x.fillRect(bx, 300, 262, 120); x.fillStyle = '#F0B03C'; x.font = "600 60px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText(k[1], bx + 24, 372);
     x.fillStyle = '#C9D1DA'; x.font = '16px ' + BF; x.fillText(k[0].toUpperCase(), bx + 24, 402);
@@ -1135,6 +1146,7 @@ function roundCanvas(r, bg) {
       x.fillStyle = '#C9D1DA'; x.fillRect(50, y + 14, W - 100, 1); y += 12;
     };
     g.mods.forEach(m => row(m.short, m.solved ? 'gelöst nach ' + fmt(m.at) : 'offen', m.solved, 'Fehler ' + m.errors));
+    if (g.u) row('Zeit der Einheit', g.u.done ? fmt(g.u.time) : 'offen', g.u.done, g.u.done ? 'davon Strafzeit ' + fmt(g.u.pen) : '-');
     y += 8;
   });
   return c;
