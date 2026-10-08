@@ -1150,11 +1150,12 @@ function roundCanvas(r, bg) {
   const ort = DATA.ort, multi = r.trupps.length > 1;
   const grp = r.trupps.map(e => {
     const mods = r.mods.filter(m => m.t === e || m.name.startsWith(ort + ' ' + e + ': ') || !multi).map(m => Object.assign({}, m, { short: m.name.replace(ort + ' ' + e + ': ', '') }));
-    const u = (r.units || []).find(x => x.e === e); return { e, mods, u, err: mods.reduce((a, m) => a + m.errors, 0), ok: mods.filter(m => m.solved).length };
+    const fr = (r.fragen || []).filter(f => f.e === e), au = (r.aufgaben || []).filter(f => f.e === e), u = (r.units || []).find(x => x.e === e);
+    return { e, mods, fr, au, u, err: u ? u.errs : mods.reduce((a, m) => a + m.errors, 0) + fr.filter(f => !f.ok).length + au.filter(f => !f.ok).length, ok: mods.filter(m => m.solved).length };
   });
-  const rowsN = grp.reduce((a, g) => a + g.mods.length + (g.u ? 1 : 0), 0), RH = 44, GH = 78;
+  const rowsN = grp.reduce((a, g) => a + g.mods.length + (g.fr.length ? 1 : 0) + g.au.length + (g.u ? 1 : 0), 0), RH = 44, GH = 112;
   const W = 1200, H = 470 + grp.length * GH + rowsN * RH + 50, c = document.createElement('canvas'); c.width = W; c.height = H;
-  const x = c.getContext('2d'); const H1 = "600 56px Oswald,'Arial Narrow',Impact,sans-serif", BF = "'Public Sans','Segoe UI',Arial,sans-serif", OS = "600 30px Oswald,'Arial Narrow',Impact,sans-serif";
+  const x = c.getContext('2d'); const BF = "'Public Sans','Segoe UI',Arial,sans-serif", OS = "600 30px Oswald,'Arial Narrow',Impact,sans-serif";
   x.fillStyle = bg || '#F5F2EB'; x.fillRect(0, 0, W, H); x.fillStyle = '#B8321F'; x.fillRect(0, 0, W, 16);
   x.fillStyle = '#17202B'; x.font = OS; x.fillText('FUNKÜBUNG ELW', 50, 74);
   x.fillStyle = '#4A5563'; x.font = "600 26px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText('Einsatz-Nr. ' + r.nr, 50, 116);
@@ -1164,24 +1165,33 @@ function roundCanvas(r, bg) {
     const bx = 50 + i * 290; x.fillStyle = '#17202B'; x.fillRect(bx, 300, 262, 120); x.fillStyle = '#F0B03C'; x.font = "600 60px Oswald,'Arial Narrow',Impact,sans-serif"; x.fillText(k[1], bx + 24, 372);
     x.fillStyle = '#C9D1DA'; x.font = '16px ' + BF; x.fillText(k[0].toUpperCase(), bx + 24, 402);
   });
+  const pill = (px, py, pw, ph, fill, stroke) => { const rr = ph / 2; x.beginPath(); x.moveTo(px + rr, py); x.arcTo(px + pw, py, px + pw, py + ph, rr); x.arcTo(px + pw, py + ph, px, py + ph, rr); x.arcTo(px, py + ph, px, py, rr); x.arcTo(px, py, px + pw, py, rr); x.closePath(); x.fillStyle = fill; x.fill(); if (stroke) { x.strokeStyle = stroke; x.lineWidth = 2; x.stroke(); } };
+  const CX = [70, 520, 800, 940];
   let y = 470;
-  grp.forEach(g => {
-    x.fillStyle = '#17202B'; x.fillRect(50, y, W - 100, 56);
-    x.fillStyle = '#F0B03C'; x.font = OS; x.fillText(DATA.funk[grp.indexOf(g) % 2 === 0 ? 'TMO' : 'DMO'].prefix + ' ' + ort + ' ' + g.e, 70, y + 38);
-    x.fillStyle = '#C9D1DA'; x.font = '600 20px ' + BF; x.textAlign = 'right';
-    const ft = 'Fehler ' + g.err; x.fillStyle = g.err ? '#E8503A' : '#C9D1DA'; x.fillText(ft, W - 70, y + 36); x.fillStyle = '#C9D1DA'; x.fillText('Module ' + g.ok + '/' + g.mods.length + '     ', W - 70 - x.measureText(ft).width, y + 36); x.textAlign = 'left';
-    y += GH - 8;
-    const row = (name, status, good, extra) => {
+  grp.forEach((g, gi) => {
+    // Kopf wie in der Auswertung: Fahrzeug-Pille links, Pillen Module und Fehler rechts
+    x.fillStyle = '#17202B'; x.fillRect(50, y, W - 100, 62);
+    const nm = DATA.funk[gi % 2 === 0 ? 'TMO' : 'DMO'].prefix + ' ' + ort + ' ' + g.e;
+    pill(66, y + 11, 330, 40, '#F0B03C'); x.fillStyle = '#17202B'; x.font = "700 22px " + BF; x.textAlign = 'center'; x.fillText(nm, 66 + 165, y + 38); x.textAlign = 'left';
+    const hp = (rx, lab, val, red) => { const pw = 168; pill(rx - pw, y + 15, pw, 32, red ? 'rgba(217,68,47,.22)' : '#121a23', red ? '#D9442F' : '#3A4A5C'); x.font = '600 14px ' + BF; x.fillStyle = '#C9D1DA'; x.fillText(lab, rx - pw + 18, y + 36); x.font = '700 17px ' + BF; x.fillStyle = red ? '#E8503A' : '#F5F2EB'; x.textAlign = 'right'; x.fillText(val, rx - 18, y + 37); x.textAlign = 'left'; };
+    hp(W - 70, 'FEHLER', String(g.err), g.err > 0); hp(W - 70 - 168 - 12, 'MODULE', g.ok + '/' + g.mods.length, false);
+    y += 62 + 34;
+    x.fillStyle = '#4A5563'; x.font = '600 15px ' + BF; ['MODUL', 'ERGEBNIS', 'FEHLER', 'GELÖST NACH'].forEach((t, i) => x.fillText(t, CX[i], y));
+    x.fillStyle = '#C9D1DA'; x.fillRect(50, y + 12, W - 100, 1); y += 12;
+    const row = (name, status, good, errs, tm) => {
       y += RH - 12;
-      x.fillStyle = '#17202B'; x.font = "600 22px " + BF; x.fillText(name, 70, y);
-      if (Array.isArray(status)) { let xx = 580; status.forEach(([t, ok]) => { x.fillStyle = ok === null ? '#4A5563' : ok ? '#2F7D4B' : '#B8321F'; x.fillText(t, xx, y); xx += x.measureText(t).width; }); }
-      else { x.fillStyle = good ? '#2F7D4B' : '#B8321F'; x.fillText(status, 580, y); }
-      x.fillStyle = /^Fehler [1-9]|^davon Strafzeit (?!00:00)/.test(extra) ? '#B8321F' : '#4A5563'; x.font = '20px ' + BF; x.fillText(extra, 920, y);
+      x.fillStyle = '#17202B'; x.font = '600 22px ' + BF; x.fillText(name, CX[0], y);
+      if (Array.isArray(status)) { let xx = CX[1]; status.forEach(([t, ok]) => { x.fillStyle = ok === null ? '#4A5563' : ok ? '#2F7D4B' : '#B8321F'; x.fillText(t, xx, y); xx += x.measureText(t).width; }); }
+      else { x.fillStyle = good ? '#2F7D4B' : '#B8321F'; x.fillText(status, CX[1], y); }
+      x.fillStyle = errs > 0 ? '#B8321F' : '#4A5563'; x.font = (errs > 0 ? '700 ' : '') + '22px ' + BF; x.fillText(String(errs), CX[2], y);
+      x.fillStyle = '#4A5563'; x.font = '22px ' + BF; x.fillText(tm, CX[3], y);
       x.fillStyle = '#C9D1DA'; x.fillRect(50, y + 14, W - 100, 1); y += 12;
     };
-    g.mods.forEach(m => row(m.short, m.solved ? 'gelöst nach ' + fmt(m.at) : 'offen', m.solved, 'Fehler ' + m.errors));
-    if (g.u) row('Zeit der Einheit', g.u.done ? fmt(g.u.time) : 'offen', g.u.done, g.u.done ? 'davon Strafzeit ' + fmt(g.u.pen) : '-');
-    y += 8;
+    g.mods.forEach(m => row(m.short, m.solved ? 'gelöst' : 'offen', m.solved, m.errors, m.at != null ? fmt(m.at) : '-'));
+    g.au.forEach(f => row(f.titel, f.ok ? 'geklappt' : 'nicht geklappt', f.ok, f.ok ? 0 : 1, '-'));
+    if (g.fr.length) { const no = g.fr.filter(f => !f.ok).length; row('Technikfragen', [[(g.fr.length - no) + ' richtig', true]].concat(no ? [[', ', null], [no + ' falsch', false]] : []), no === 0, no, '-'); }
+    if (g.u) row('Zeit der Einheit' + (g.u.done ? ' (Strafzeit ' + fmt(g.u.pen) + ')' : ''), g.u.done ? 'fertig' : 'offen', g.u.done, g.u.errs, g.u.done ? fmt(g.u.time) : '-');
+    y += 22;
   });
   return c;
 }
