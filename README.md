@@ -28,3 +28,8 @@ Voraussetzung: Python mit Playwright (`pip install playwright`) und Chromium, au
     python3 full.py       # kompletter Ablauf mit 1, 2 und 4 Einheiten
     python3 smoke_standalone.py  # Grundablauf der Standalone-Variante
     python3 pdfall.py     # PDFs werden erzeugt, ohne Gedankenstriche
+
+## Werkzeuge
+
+- `tools/build_uebungsleiter.py` baut `uebungsleiter.html` aus der Vorlage.
+- `tools/build_pdf_fonts.py` erzeugt die in die PDFs eingebetteten Schriften (Liberation Sans, SIL Open Font License, als Teilmenge) und setzt sie in `funkuebung.html` und `standalone.html` ein. Nur nötig, wenn sich die Schrift ändern soll (braucht `fonttools`).

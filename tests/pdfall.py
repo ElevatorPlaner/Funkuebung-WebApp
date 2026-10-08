@@ -12,7 +12,9 @@ with sync_playwright() as p:
         txt = subprocess.run(['pdftotext', f, '-'], capture_output=True, text=True).stdout
         pages = [l for l in info.splitlines() if l.startswith('Pages')]
         dash = ('—' in txt) or ('–' in txt)
-        print(r[0], pages, 'Gedankenstrich' if dash else 'ok', len(txt))
-        if dash or not pages: bad.append(r[0])
+        fonts = subprocess.run(['pdffonts', f], capture_output=True, text=True).stdout.strip().splitlines()[2:]
+        embedded = all(l.split()[-5] == 'yes' for l in fonts) if fonts else None   # QR-PDF hat keinen Text
+        print(r[0], pages, 'Gedankenstrich' if dash else 'ok', len(txt), 'Schriften eingebettet:' if fonts else 'ohne Textschrift', embedded if fonts else '')
+        if dash or not pages or embedded is False: bad.append(r[0])
     print(errs); b.close()
 raise SystemExit(1 if bad or errs else 0)
