@@ -372,7 +372,7 @@ function renderAbend() {
   const miss = {};
   list.forEach(r => r.e.forEach(e => answersOf(r, e).forEach(x => { const m = miss[x.q.id] = miss[x.q.id] || { t: x.q.titel, n: 0, w: 0 }; m.n++; if (!x.ok) m.w++; })));
   const worst = Object.values(miss).filter(m => m.w).sort((a, b) => b.w / b.n - a.w / a.n || b.w - a.w).slice(0, 5);
-  h += '<div class="tblwrap"><table><tr><th>Zeit</th><th>Gruppe</th><th>Ergebnis</th><th>Zeit im Einsatz</th><th>Einheiten</th></tr>';
+  h += '<div class="tblwrap"><table><tr><th>Zeit</th><th>Kommunikatoren ELW</th><th>Ergebnis</th><th>Zeit im Einsatz</th><th>Einheiten</th></tr>';
   list.forEach(r => {
     const t = new Date(r.first * 1000).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
     const res = r.end ? '<span class="res ' + (r.end.ok ? 'ok' : 'no') + '">' + esc(r.end.reason) + '</span>' : '<span class="muted">nicht beendet gesehen</span>';
