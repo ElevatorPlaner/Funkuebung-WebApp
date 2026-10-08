@@ -56,7 +56,9 @@ details.card .inner .chips{display:grid;grid-template-columns:repeat(auto-fill,1
 details.card .inner .chip{height:42px;padding:0 8px;border-radius:999px;width:152px}
 @media (max-width:640px){details.card .inner{grid-template-columns:1fr}details.card .inner>div{grid-column:1/-1!important}}
 details.card .inner .seg button{font-size:.9rem;padding:6px 4px}
-.unit{position:relative}.unit input{padding-right:100px}.unit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.unit{position:relative}.unit input{padding-right:100px}.unit.tab input{padding-right:160px}.unit .cp{position:absolute;top:50%;transform:translateY(-50%);height:30px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);color:var(--fg);font-size:.78rem;font-weight:700;letter-spacing:.04em;cursor:pointer}.unit .cp:hover{border-color:var(--muted)}#tqCp{right:6px;min-width:84px}#tqQr{right:96px}
+.qrov{position:fixed;inset:0;z-index:50;background:rgba(10,15,22,.86);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:20px;text-align:center}.qrov canvas{border-radius:10px;max-width:90vw;max-height:70vh}.qrov .btn{min-width:160px}
+.unit span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
 .unit input[type=number]{-moz-appearance:textfield}.unit input::-webkit-outer-spin-button,.unit input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .lab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;height:1.2em}.lab label.f{margin:0}
 .cnt2{font-size:.85rem;color:var(--muted)}.cnt2 b{color:var(--amber)}
@@ -351,6 +353,10 @@ table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-sp
         <div>
           <label class="f" for="tqK">Technikfragen: Kanal</label>
           <div class="unit"><input type="text" id="tqK" autocomplete="off" spellcheck="false" title="Kanal geheim halten"></div>
+        </div>
+        <div>
+          <label class="f" for="tqTab">Übungsleiter-Tablet: Link</label>
+          <div class="unit tab"><input type="text" id="tqTab" readonly spellcheck="false"><button type="button" class="cp" id="tqQr">QR</button><button type="button" class="cp" id="tqCp">Kopieren</button></div>
         </div>
       </div>
     </details>
@@ -862,7 +868,7 @@ function initStart() {
   $('#team1').value = S.team1 || ''; $('#team2').value = S.team2 || '';
   if (!S.tqK) { S.tqK = 'funk-' + Array.from(crypto.getRandomValues(new Uint8Array(12)), b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join(''); saveS(); }
   if (!S.tqUrl) { S.tqUrl = TQ_URL; saveS(); }
-  $('#tqUrl').value = S.tqUrl; $('#tqK').value = S.tqK;
+  $('#tqUrl').value = S.tqUrl; $('#tqK').value = S.tqK; paintTab();
   $('#limit').value = S.limit; $('#pen').value = S.pen; $('#fixnr').value = S.fixnr;
   setSeg('#segN', String(S.n));
   setSeg('#segMode', S.mode); setSeg('#segSound', String(S.sound)); setSeg('#segB', S.bmode); setSeg('#segM', S.mset); setSeg('#segR', S.rn);
@@ -886,8 +892,9 @@ $('#truppChips').onclick = e => {
 ['team1', 'team2', 'limit', 'pen', 'fixnr'].forEach(id => $('#' + id).addEventListener('input', () => {
   S.team1 = $('#team1').value.trim(); S.team2 = $('#team2').value.trim(); S.limit = Math.max(1, +$('#limit').value || 15); S.pen = Math.max(0, +$('#pen').value >= 0 && $('#pen').value !== '' ? +$('#pen').value : 15); S.fixnr = $('#fixnr').value.trim(); saveS();
 }));
-$('#tqUrl').addEventListener('input', () => { S.tqUrl = $('#tqUrl').value.trim(); saveS(); });
-$('#tqK').addEventListener('input', () => { S.tqK = $('#tqK').value.replace(/[^A-Za-z0-9_-]/g, ''); saveS(); });
+$('#tqUrl').addEventListener('input', () => { S.tqUrl = $('#tqUrl').value.trim(); saveS(); paintTab(); });
+$('#tqCp').addEventListener('click', tabCopy); $('#tqQr').addEventListener('click', tabQr);
+$('#tqK').addEventListener('input', () => { S.tqK = $('#tqK').value.replace(/[^A-Za-z0-9_-]/g, ''); saveS(); paintTab(); });
 $('#segM').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.mset = b.dataset.v; setSeg('#segM', S.mset); saveS(); };
 $('#segR').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.rn = b.dataset.v; setSeg('#segR', S.rn); saveS(); };
 $('#segB').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.bmode = b.dataset.v; setSeg('#segB', S.bmode); saveS(); };
@@ -1230,6 +1237,28 @@ function tqWrong(ti) { return Object.values(G.tq || {}).filter(x => x.ti === ti)
 function tqCount(ti) { const it = Object.values(G.tq || {}).filter(x => x.ti === ti).flatMap(x => x.items); return { n: it.length, ok: it.filter(i => i.ok).length }; }
 function tqList() { return Object.values(G.tq || {}).sort((a, b) => a.ti - b.ti || a.items[0].s - b.items[0].s).flatMap(x => x.items); }
 
+function tabletLink() {
+  let u = (S.tqUrl || '').trim().split('?')[0].split('#')[0];
+  if (!/^https:\/\/.+/i.test(u) || !S.tqK) return '';
+  u = /\.html?$/i.test(u) ? u.replace(/[^/]*$/, '') : u.replace(/\/?$/, '/');
+  return u + 'uebungsleiter.html?k=' + encodeURIComponent(S.tqK);
+}
+function paintTab() { const el = $('#tqTab'); if (!el) return; const l = tabletLink(); el.value = l; el.placeholder = 'Erst Adresse und Kanal eintragen'; $('#tqCp').disabled = $('#tqQr').disabled = !l; }
+function tabCopy() {
+  const l = tabletLink(); if (!l) return; const el = $('#tqTab'), b = $('#tqCp');
+  const done = ok => { el.setSelectionRange(0, 0); el.scrollLeft = 0; if (ok) el.blur(); b.textContent = ok ? 'Kopiert' : 'Markiert'; setTimeout(() => { b.textContent = 'Kopieren'; }, 1600); };
+  el.focus(); el.select(); el.setSelectionRange(0, l.length);
+  let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+  if (!ok && navigator.clipboard) { navigator.clipboard.writeText(l).then(() => done(true), () => done(false)); } else done(ok);
+}
+function tabQr() {
+  const l = tabletLink(); if (!l) return;
+  const o = document.createElement('div'); o.className = 'qrov';
+  o.innerHTML = '<div class="lbl">Mit dem Tablet scannen: Übungsleiter</div>';
+  const cv = qrCanvas(l, 520); cv.style.width = 'min(520px,80vmin)'; cv.style.height = cv.style.width; o.appendChild(cv);
+  const bt = document.createElement('button'); bt.className = 'btn'; bt.textContent = 'Schließen'; bt.onclick = () => o.remove(); o.appendChild(bt);
+  o.onclick = e => { if (e.target === o) o.remove(); }; document.body.appendChild(o);
+}
 function tqLink(st) { const u = (S.tqUrl || '').trim(); return u + (u.includes('?') ? '&' : '?') + 's=' + st + '&k=' + encodeURIComponent(S.tqK); }
 function qrCanvas(text, px) {
   const m = qrMatrix(text), n = m.length, q = 4, cell = Math.floor(px / (n + 2 * q)), size = cell * (n + 2 * q);
