@@ -37,3 +37,13 @@ Voraussetzung: Python mit Playwright (`pip install playwright`) und Chromium, au
 ## Dateien in den Drive-Ordner holen
 
 `tools/Dateien_aktualisieren.bat` auf dem Windows-Rechner doppelklicken (die `.ps1` muss daneben liegen). Es lädt `funkuebung.html`, `standalone.html` und `uebungsleiter.html` aus dem Repo und überschreibt damit `Funkuebung_ELW_V2.html`, `Funkuebung_ELW_Standalone.html` und `Funkuebung_Uebungsleiter_Tablet.html` im Ordner "WebApp Funkübung". Insync lädt sie danach ins Google Drive.
+
+## Zum Testen im Browser (ohne Kopieren)
+
+Die Hauptversion und die Standalone-Variante liegen zusätzlich auf GitHub Pages:
+
+- V2: `https://elevatorplaner.github.io/Funkuebung-WebApp/elw.html`
+- Standalone: `https://elevatorplaner.github.io/Funkuebung-WebApp/standalone.html`
+- Übungsleiter-Tablet: `https://elevatorplaner.github.io/Funkuebung-WebApp/uebungsleiter.html`
+
+Die Einstellungen und der Kanal speichert der Browser getrennt für jede Adresse. Für den echten Einsatz im ELW weiter die Datei vom USB-Stick benutzen und dort den Kanal gleich halten (Einstellungen, Kanal anzeigen oder ändern).
