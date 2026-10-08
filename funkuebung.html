@@ -851,6 +851,7 @@ MODULES.push({
    Einstellungen und Startseite
    ========================================================= */
 const S = Object.assign({ team: '', mode: 'limit', limit: 15, pen: 15, fixnr: '', trupps: ['43', '44'], sound: 1, bmode: 'zufall', mset: 'versch', rn: 'voll', n: 6, team1: '', team2: '', tqUrl: '', tqK: '' }, store.get('funk_settings', {}));
+const TQ_URL = 'https://elevatorplaner.github.io/Funkuebung-WebApp/';
 function saveS() { store.set('funk_settings', S); }
 function seqToday() { return store.get('funk_seq_' + today(), 0); }
 function nextNr() { return today() + '_' + String(seqToday() + 1).padStart(3, '0'); }
@@ -860,7 +861,8 @@ function show(id) { $$('.screen').forEach(s => s.classList.toggle('on', s.id ===
 function initStart() {
   $('#team1').value = S.team1 || ''; $('#team2').value = S.team2 || '';
   if (!S.tqK) { S.tqK = 'funk-' + Array.from(crypto.getRandomValues(new Uint8Array(12)), b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join(''); saveS(); }
-  $('#tqUrl').value = S.tqUrl || ''; $('#tqK').value = S.tqK;
+  if (!S.tqUrl) { S.tqUrl = TQ_URL; saveS(); }
+  $('#tqUrl').value = S.tqUrl; $('#tqK').value = S.tqK;
   $('#limit').value = S.limit; $('#pen').value = S.pen; $('#fixnr').value = S.fixnr;
   setSeg('#segN', String(S.n));
   setSeg('#segMode', S.mode); setSeg('#segSound', String(S.sound)); setSeg('#segB', S.bmode); setSeg('#segM', S.mset); setSeg('#segR', S.rn);
