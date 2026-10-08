@@ -985,7 +985,7 @@ $('#gSound').onclick = () => { soundOn = !soundOn; S.sound = soundOn ? 1 : 0; sa
 /* Druckliste auf der Startseite */
 const PL = [
   { k: 'rules', t: 'Einsatzunterlagen', s: 'Je Einheit 1 Exemplar, an die Einheiten', w: 'Einheiten', c: 'var(--amber)', f: () => { buildRules(); return [rulesPdf(), 'Einsatzunterlagen_Funkuebung_ELW.pdf']; } },
-  { k: 'plan', t: 'Ablaufplan', s: 'Für Kommunikatoren ELW und Ausbilder', w: 'ELW', c: '#aab4c0', f: () => [planPdf(), 'Ablaufplan_Funkuebung_ELW.pdf'] }
+  { k: 'plan', t: 'Ablaufplan', s: 'Für Kommunikatoren ELW und Übungsleiter', w: 'ELW', c: '#aab4c0', f: () => [planPdf(), 'Ablaufplan_Funkuebung_ELW.pdf'] }
 ];
 const plKey = () => 'funks_druck_' + today();
 function plPaint(init) {
@@ -1199,7 +1199,7 @@ function planPdf() {
   const f = n => n.toFixed(2);
   const hx = h => [1, 3, 5].map(i => (parseInt(h.substr(i, 2), 16) / 255).toFixed(3)).join(' ');
   const RED = hx('#b8321f'), TEAL = hx('#1f7a8c'), GRN = hx('#3f9a66'), GREY = '0.36 0.4 0.45', TXT = '0.1 0.14 0.19';
-  const LANES = [['Kommunikatoren ELW', hx('#5c6675'), '0.955 0.957 0.965'], ['Einheiten', hx('#e9a21f'), '0.992 0.975 0.945'], ['Ausbilder', hx('#3f7fd0'), '0.945 0.962 0.987']];
+  const LANES = [['Kommunikatoren ELW', hx('#5c6675'), '0.955 0.957 0.965'], ['Einheiten', hx('#e9a21f'), '0.992 0.975 0.945'], ['Übungsleiter', hx('#3f7fd0'), '0.945 0.962 0.987']];
   const PH = [
     ['Vorbereitung', TEAL, [
       [0, 'App öffnen', 'Namen, Module wählen'],
@@ -1233,7 +1233,7 @@ function planPdf() {
   // Kopf
   c.push(`${RED} rg 0 ${f(H - 12)} 595 12 re f`);
   text('Ablaufplan Funkübung ELW', 30, 46, 22, true, RED);
-  text('Wer macht wann was: Kommunikatoren ELW, Einheiten und Ausbilder', 30, 60, 8.5, false, GREY);
+  text('Wer macht wann was: Kommunikatoren ELW, Einheiten und Übungsleiter', 30, 60, 8.5, false, GREY);
   // Bahnen: Hintergrund wird nach der Höhenberechnung gezeichnet, deshalb Platzhalter-Index
   const bgIdx = c.length;
   LANES.forEach(([nm, col], i) => { rr(XS[i], 72, WS[i], 26, 13, col); text(nm, XS[i] + WS[i] / 2, 89, 10.5, true, '1 1 1', 'm'); });

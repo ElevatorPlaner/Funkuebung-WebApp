@@ -1,7 +1,7 @@
 # Funkübung ELW (Feuerwehr Aidlingen)
 
 - `funkuebung.html`: die App für den ELW-PC (eine Datei, offline lauffähig, wird nicht veröffentlicht)
-- `standalone.html`: abgeleitete Fassung ohne Technikfragen per QR-Code und Handy und ohne Ausbilder-App (eigener Speicherschlüssel `funks_settings`). Wird parallel zur App weiterentwickelt, `funkuebung.html` bleibt das Hauptprojekt.
+- `standalone.html`: abgeleitete Fassung ohne Technikfragen per QR-Code und Handy und ohne Übungsleiter-App (eigener Speicherschlüssel `funks_settings`). Wird parallel zur App weiterentwickelt, `funkuebung.html` bleibt das Hauptprojekt.
 - `fragen.html`: Handy-Seite für die Technikfragen, wird per GitHub Pages unter https ausgeliefert
 - Der Fragenpool (`fragen:` im `DATA`-Block) muss in beiden Dateien identisch sein.
 
