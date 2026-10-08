@@ -329,7 +329,7 @@ table.t th{color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-sp
         </div>
         <div>
           <label class="f">Zeitmodus</label>
-          <div class="seg" id="segMode"><button data-v="limit" class="on">Zeitlimit</button><button data-v="up">Stoppuhr</button></div>
+          <div class="seg" id="segMode"><button data-v="limit">Zeitlimit</button><button data-v="up" class="on">Stoppuhr</button></div>
         </div>
         <div id="limitBox">
           <label class="f" for="limit">Zeitlimit</label>
@@ -869,7 +869,7 @@ MODULES.push({
 /* =========================================================
    Einstellungen und Startseite
    ========================================================= */
-const S = Object.assign({ team: '', mode: 'limit', limit: 15, pen: 15, fixnr: '', trupps: ['43', '44'], sound: 1, bmode: 'zufall', mset: 'versch', rn: 'voll', n: 6, team1: '', team2: '', tqUrl: '', tqK: '' }, store.get('funk_settings', {}));
+const S = Object.assign({ team: '', mode: 'up', limit: 15, pen: 15, fixnr: '', trupps: ['43', '44'], sound: 1, bmode: 'zufall', mset: 'versch', rn: 'voll', n: 6, team1: '', team2: '', tqUrl: '', tqK: '' }, store.get('funk_settings', {}));
 const TQ_URL = 'https://elevatorplaner.github.io/Funkuebung-WebApp/';
 function saveS() { store.set('funk_settings', S); }
 function seqToday() { return store.get('funk_seq_' + today(), 0); }
